@@ -2,6 +2,7 @@
 <p align="center"><em>A GM's player companion for AzerothCore 3.3.5a</em></p>
 <p align="center">Built by a private server owner who actually plays the game as a GM.</p>
 <p align="center">by <strong>Parriah</strong></p>
+<p align="center"><a href="https://github.com/ntorres38/MiniGM">github.com/ntorres38/MiniGM</a></p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/WoW-3.3.5a%20(WotLK)-A330C9" alt="WoW 3.3.5a">
@@ -193,7 +194,7 @@ You don't need to port-forward a private realm. Tailscale or WireGuard with a su
 
 ## Install
 
-1. Go to [Releases](../../releases) and download **`MiniGM-Addon-1.0.0.zip`**.
+1. Go to [Releases](https://github.com/ntorres38/MiniGM/releases) and download **`MiniGM-Addon-1.0.0.zip`**.
 2. Open it. There's one folder inside, called `MiniGM`.
 3. Drag that folder into `<World of Warcraft>\Interface\AddOns\`.
 4. Restart the client. `/reload` won't find a new addon.
