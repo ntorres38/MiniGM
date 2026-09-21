@@ -36,7 +36,7 @@ It's GPLv2 and actively maintained, and it inherits that whole history: MaNGOS, 
 - **It's yours.** Your rates, your rules, your patch. Nothing gets sunset.
 - **It's free and you can change it.** There's a big [module catalogue](https://www.azerothcore.org/catalogue.html) the community keeps adding to.
 - **The hardware bar is low.** Mine runs on a second-hand office desktop.
-- **Modules are what make a tiny realm work.** [mod-playerbots](https://github.com/liyunfan1223/mod-playerbots) fills your party and raid with AI-controlled characters. Four people can clear a twenty-five man raid. One person can. Without something like that, a server with a handful of players is just an empty world.
+- **Modules are what make a tiny realm work.** [mod-playerbots](https://github.com/liyunfan1223/mod-playerbots) fills your party and raid with AI-controlled characters, so a group of four can go and attempt content built for twenty-five. The bots aren't good — they stand in fire and fumble boss mechanics — but without them a realm with a handful of players doesn't have much to do past questing.
 
 **MiniGM needs one of these.** It's a client-side addon that sends GM commands to a server. Without an AzerothCore realm where you hold GM rights, it has nothing to talk to. If you're starting from nothing, AzerothCore's own [installation guide](https://www.azerothcore.org/wiki/installation) is the place to go.
 
