@@ -193,27 +193,13 @@ You don't need to port-forward a private realm. Tailscale or WireGuard with a su
 
 ## Install
 
-1. Grab the zip from **[Releases](../../releases)**.
-2. Extract it straight into `<World of Warcraft>\Interface\AddOns\`.
-3. Restart the client. `/reload` won't find a new addon.
-4. Type `/mgm`.
+1. Download **`MiniGM-1.0.0-rc.zip`** from [Releases](../../releases).
+2. Open it. There's one folder inside, called `MiniGM`.
+3. Drag that folder into `<World of Warcraft>\Interface\AddOns\`.
+4. Restart the client. `/reload` won't find a new addon.
+5. Type `/mgm`.
 
-That's it — the release zip already has the folder named correctly, so there's nothing to rename. You should end up with:
-
-```
-<World of Warcraft>\Interface\AddOns\MiniGM\
-    MiniGM.toc
-    MiniGM.lua
-    Tele\TeleportDB.lua
-    LICENSE
-    README.md
-```
-
-**If you grab the source instead** (green **Code** button → Download ZIP), that one extracts to a folder called `MiniGM-main`. WoW needs the folder name to match the `.toc` name, so rename it to `MiniGM` or the client won't see it. The release zip exists so you don't have to think about this.
-
-**Either way, don't lose the `Tele` folder.** That's where the 1,306 locations live. Without it the addon still loads, but the Tele tab will tell you the database is missing.
-
-You should see `MiniGM: v1.0.0-rc loaded`, and the Tele tab should report `loaded - 1306 locations in 143 zones`. If it says the database didn't load, the `Tele` folder didn't copy.
+You should see `MiniGM: v1.0.0-rc loaded`, and the Tele tab should say `loaded - 1306 locations in 143 zones`.
 
 More detail and troubleshooting in [docs/INSTALL.md](docs/INSTALL.md).
 

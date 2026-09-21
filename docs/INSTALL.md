@@ -15,11 +15,13 @@ No libraries, no dependencies.
 
 ## Install
 
-### 0. The easy way
+### 0. From the release zip (recommended)
 
-Download the zip from **[Releases](../../../releases)** and extract it straight into `<World of Warcraft>\Interface\AddOns\`. The folder inside is already named `MiniGM`, so there is nothing to rename. Skip to step 2.
+Download `MiniGM-<version>.zip` from **[Releases](../../../releases)**, open it, and drag the `MiniGM` folder inside it into `<World of Warcraft>\Interface\AddOns\`. Then skip to step 2.
 
-The rest of this section is for installing from source.
+The zip is packaged with the folder already named correctly, so there is nothing to rename and nothing to reassemble. It also contains `LICENSE` and `README.md`; WoW ignores both, and the licence is in there because a release is distribution and GPLv3 asks for it to travel with the work.
+
+**If you install from source instead**, read on — there are two ways it goes wrong.
 
 ### 1. Put the folder in place
 
