@@ -26,7 +26,7 @@
 ----------------------------------------------------------------------]]
 
 local ADDON   = "MiniGM"
-local VERSION = "1.0.0-rc"
+local VERSION = "1.0.0"
 local FRAME_H = 378
 
 local GOLD  = "|cffffd100"

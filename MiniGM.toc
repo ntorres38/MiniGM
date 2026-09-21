@@ -2,7 +2,7 @@
 ## Title: MiniGM
 ## Notes: A small GM panel for AzerothCore 3.3.5a - |cffffd100by Parriah|r
 ## Author: Parriah
-## Version: 1.0.0-rc
+## Version: 1.0.0
 ## X-License: GPLv3
 ## X-Category: Miscellaneous
 ## SavedVariables: MiniGMDB

@@ -4,6 +4,23 @@ WoW 3.3.5a (Interface 30300), AzerothCore.
 
 ---
 
+## 1.0.0 — first release
+
+Everything in 1.0.0-rc, plus the documentation and packaging work that came out of actually publishing it.
+
+- ADD A "First, some context" opener — what World of Warcraft was, why patch 3.3.5a matters, where private servers came from, and what AzerothCore is. Figures sourced to Guinness and Blizzard's 2010 investor release.
+- ADD An explicit statement that this project does not link to, host or help anyone obtain a game client.
+- ADD `MiniGM-Addon-<version>.zip` as the release download, containing a correctly named `MiniGM` folder. The `-Addon-` is there because the naive filename collides exactly with the "Source code (zip)" GitHub attaches to every release.
+- CHANGE Install on the front page is five steps: download, open, drag the folder into AddOns, restart, `/mgm`. The caveats moved to `docs/INSTALL.md`.
+- FIX Restored the Commands section to the README. An earlier rewrite dropped it, leaving `/mgm runspeed` as the only slash command mentioned anywhere — and it sat in a table of buttons, so it read as though there were a control for it.
+- FIX Teleport picker was 640px wide and its own three columns needed 642. The Search label was anchored off-frame entirely. Now 668×372.
+- FIX Corrected the mount-aura claim in four places. The docs said the aura "gets stripped indoors and in instances" as fact; it does not do that reliably — flying inside the Stormwind auction house held fine.
+- CHANGE The panel always opens on the HUD tab. Remembering the last tab meant logging in to a near-empty Tele panel and wondering what broke.
+- CHANGE Screenshots moved next to the features they show.
+- CHANGE Prose rewritten throughout for a plainer voice.
+
+---
+
 ## 1.0.0-rc — first public release candidate
 
 First public build. Everything below this entry is unreleased private development, kept because the *reasons* are worth reading — several entries document server behaviour that is not written down anywhere else.

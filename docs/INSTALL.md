@@ -19,7 +19,7 @@ No libraries, no dependencies.
 
 Download **`MiniGM-Addon-<version>.zip`** from **[Releases](../../../releases)**, open it, and drag the `MiniGM` folder inside it into `<World of Warcraft>\Interface\AddOns\`. Then skip to step 2.
 
-**Take the one with `Addon` in the name.** GitHub attaches a "Source code (zip)" to every release automatically. That is the whole repository, and the folder inside it is named after the tag (`MiniGM-1.0.0-rc`), which WoW will not load.
+**Take the one with `Addon` in the name.** GitHub attaches a "Source code (zip)" to every release automatically. That is the whole repository, and the folder inside it is named after the tag (`MiniGM-1.0.0`), which WoW will not load.
 
 The zip is packaged with the folder already named correctly, so there is nothing to rename and nothing to reassemble. It also contains `LICENSE` and `README.md`; WoW ignores both, and the licence is in there because a release is distribution and GPLv3 asks for it to travel with the work.
 

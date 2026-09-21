@@ -7,7 +7,7 @@ This document is written to be given to a large language model. Upload it to Cla
 It is also perfectly readable by a human. Nothing here assumes you write Lua.
 
 - **Addon:** MiniGM by Parriah
-- **Version:** 1.0.0-rc
+- **Version:** 1.0.0
 - **Target:** World of Warcraft 3.3.5a (WotLK, build 12340), Interface 30300
 - **Server:** AzerothCore
 - **Licence:** GPLv3
@@ -131,7 +131,7 @@ Copy-Item -Force "$src\Tele\TeleportDB.lua" "$dst\Tele"
 
 **Restart the client fully.** A new addon is not found by `/reload`. At character select, check **AddOns** and confirm MiniGM is listed and ticked.
 
-**Verify.** On login you should see `MiniGM: v1.0.0-rc loaded. /mgm to show/hide.` Type `/mgm`, click **Tele**, and it should report `loaded - 1306 locations in 143 zones`. If it says `FAILED: Tele\TeleportDB.lua did not load` in red, the subfolder did not copy.
+**Verify.** On login you should see `MiniGM: v1.0.0 loaded. /mgm to show/hide.` Type `/mgm`, click **Tele**, and it should report `loaded - 1306 locations in 143 zones`. If it says `FAILED: Tele\TeleportDB.lua did not load` in red, the subfolder did not copy.
 
 **Updating.** A `.lua`-only change needs `/reload`. A `.toc` change, or adding/removing a file, needs a full client restart. Settings live in `WTF\Account\<ACCOUNT>\SavedVariables\MiniGM.lua` and survive updates.
 
@@ -721,8 +721,8 @@ Yes. GPLv3. Keep it GPLv3, ship the licence, make the source available, and say 
 **My teleport picker doesn't open on my current zone.**
 Zone names were typed by hand upstream and do not always match `GetRealZoneText()`. Cosmetic; browse or search. If a zone you use often misses, that is a normalisation map worth adding.
 
-**Why did version go from 3.4 Beta to 1.0.0-rc?**
-Everything before this was unreleased private development. 1.0.0-rc is the first public build; the development history is in `CHANGELOG.md`.
+**Why did version go from 3.4 Beta to 1.0.0?**
+Everything before this was unreleased private development. 1.0.0-rc was the first public build and 1.0.0 followed it; the development history is in `CHANGELOG.md`.
 
 ---
 

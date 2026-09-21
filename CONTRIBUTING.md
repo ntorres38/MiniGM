@@ -50,7 +50,7 @@ Bump `## Version:` in `MiniGM.toc` **and** `local VERSION` in `MiniGM.lua`. They
 The release zip is **not** the source zip. GitHub's auto-generated one extracts to `MiniGM-main`, which WoW won't load without a rename. Build a proper one:
 
 ```powershell
-$v = "1.0.0-rc"
+$v = "1.0.0"
 $stage = "$env:TEMP\MiniGM-pkg"
 Remove-Item -Recurse -Force $stage -EA SilentlyContinue
 New-Item -ItemType Directory -Force -Path "$stage\MiniGM\Tele" | Out-Null
@@ -61,7 +61,7 @@ Compress-Archive -Force -Path "$stage\MiniGM" -DestinationPath "..\MiniGM-Addon-
 
 Then draft a release against the matching tag and attach that file.
 
-**The `-Addon-` in the filename is not decoration.** GitHub auto-attaches a "Source code (zip)" to every release, and for tag `v1.0.0-rc` that file is named `MiniGM-1.0.0-rc.zip` — identical to what you would naturally call the packaged one. Two files with the same name on the same page, one of which does not work, is how people end up with a folder called `MiniGM-1.0.0-rc` in their AddOns directory wondering why nothing loaded.
+**The `-Addon-` in the filename is not decoration.** GitHub auto-attaches a "Source code (zip)" to every release, and for tag `v1.0.0` that file is named `MiniGM-1.0.0.zip` — identical to what you would naturally call the packaged one. Two files with the same name on the same page, one of which does not work, is how people end up with a folder named after the tag in their AddOns directory wondering why nothing loaded.
 
 `LICENSE` is in the zip deliberately. A release is distribution, and GPLv3 asks for the licence text to travel with the work. `README.md` is there so anyone who only has the zip knows where it came from. WoW ignores both.
 
