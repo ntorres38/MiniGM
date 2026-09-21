@@ -17,6 +17,11 @@ First public build. Everything below this entry is unreleased private developmen
   its box at x=26, so it rendered off-frame entirely. Now 668x372 with
   symmetrical 26px margins and the label anchored to the frame.
 - ADD Screenshots.
+- ADD A Commands section to the README. An earlier draft had one and it was
+  lost in a rewrite, leaving `/mgm runspeed` as the only slash command
+  mentioned anywhere - sitting in a table of buttons, where it read as if
+  there were a control for it. All 13 are listed now, under a heading that
+  says plainly they are typed.
 - FIX Docs overstated the mount-aura failsafe. They said the aura "gets
   stripped indoors and in instances" as a flat fact; it is not that
   predictable - flying inside the Stormwind auction house held fine. The

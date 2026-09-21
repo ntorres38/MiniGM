@@ -38,7 +38,7 @@ So I built a small HUD that plays alongside you and doesn't make you stop what y
 
 | Section | Buttons | Notes |
 |---|---|---|
-| **Movement** | Speed *n*× · Speed normal | Defaults to 1.5×. `/mgm runspeed <n>` changes it and the button relabels itself. Hits your target if you have one, otherwise you. |
+| **Movement** | Speed *n*× · Speed normal | Defaults to 1.5×. There's no button to change that — it's a [typed command](#commands), and the button relabels itself when you do. Hits your target if you have one, otherwise you. |
 | | Fly ON · Fly OFF | GM flight that's actually fast. [This took a while to work out.](#flight-speed-is-a-lie) |
 | **Survival** | God ON · God OFF | `.cheat god`, always on you |
 | | Full heal | An actual heal, not the max-HP hack you'll find in old macro guides |
@@ -87,6 +87,32 @@ It scales instead of resizing because every button sits at a hardcoded pixel off
 There's an optional minimap icon (left-click opens, shift-drag moves it, shift-right-click hides it). You can collapse the panel to its title bar, and the tabs still work collapsed. Esc closes the picker. Positions, sizes, minimap angle, alt list and speed settings all survive a relog.
 
 Destructive buttons refuse before they fire rather than asking afterwards. Kill won't target you or a friendly. Level won't go down. Modifying your own character makes you type `Accept` first, which has saved me at least twice.
+
+---
+
+## Commands
+
+**These are typed into chat. There are no buttons for them** — everything the panel does with a click is in the tables above; this is the rest.
+
+`/mgm` on its own shows and hides the panel. `/minigm` works too if you'd rather type it out.
+
+| Command | Range | Default | Does |
+|---|---|---|---|
+| `/mgm` | | | show / hide the panel |
+| `/mgm help` | | | prints all of this in game, with your current values |
+| `/mgm minimap` | | off | turn the minimap icon on or off |
+| `/mgm scale <n>` | 0.5–2.0 | 1.0 | panel size, same as dragging its corner |
+| `/mgm telescale <n>` | 0.5–2.0 | 1.0 | picker size, same as dragging its corner |
+| `/mgm reset` | | | both windows back to centre at normal size |
+| `/mgm alts` | | | list the alts it's remembered |
+| `/mgm addalt <A,B>` | | | add names by hand, comma separated |
+| `/mgm forgetalt <Name>` | | | drop one (or right-click it in the Add alt list) |
+| `/mgm runspeed <n>` | 0.1–50 | 1.5 | ground speed multiplier the Speed button sends |
+| `/mgm flyspeed <n>` | 0.1–50 | 4.65 | flight speed multiplier |
+| `/mgm flymount <id>` | | 28652 | mount displayID used for fast flight |
+| `/mgm titlefit <n>` | 1.0–4.0 | 1.9 | width of the title bar art, if your title overflows it |
+
+`runspeed`, `flyspeed` and `flymount` stick around between sessions, so you set them once. The speed limits aren't mine — 50 is what the server accepts.
 
 ---
 
