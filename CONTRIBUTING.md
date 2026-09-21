@@ -45,6 +45,24 @@ luac5.1 -p Tele/TeleportDB.lua
 
 Bump `## Version:` in `MiniGM.toc` **and** `local VERSION` in `MiniGM.lua`. They must match.
 
+## Cutting a release
+
+The release zip is **not** the source zip. GitHub's auto-generated one extracts to `MiniGM-main`, which WoW won't load without a rename. Build a proper one:
+
+```powershell
+$v = "1.0.0-rc"
+$stage = "$env:TEMP\MiniGM-pkg"
+Remove-Item -Recurse -Force $stage -EA SilentlyContinue
+New-Item -ItemType Directory -Force -Path "$stage\MiniGM\Tele" | Out-Null
+Copy-Item MiniGM.toc, MiniGM.lua, LICENSE, README.md "$stage\MiniGM"
+Copy-Item Tele\TeleportDB.lua "$stage\MiniGM\Tele"
+Compress-Archive -Force -Path "$stage\MiniGM" -DestinationPath "..\MiniGM-$v.zip"
+```
+
+Then draft a release against the matching tag and attach that file.
+
+`LICENSE` is in the zip deliberately. A release is distribution, and GPLv3 asks for the licence text to travel with the work. `README.md` is there so anyone who only has the zip knows where it came from. WoW ignores both.
+
 ## Licence
 
 MiniGM is **GPLv3**, and not by choice — see [docs/ATTRIBUTION.md](docs/ATTRIBUTION.md). Contributions are accepted under the same licence. Do not paste in code from a non-GPL-compatible source.

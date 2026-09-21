@@ -15,6 +15,12 @@ No libraries, no dependencies.
 
 ## Install
 
+### 0. The easy way
+
+Download the zip from **[Releases](../../../releases)** and extract it straight into `<World of Warcraft>\Interface\AddOns\`. The folder inside is already named `MiniGM`, so there is nothing to rename. Skip to step 2.
+
+The rest of this section is for installing from source.
+
 ### 1. Put the folder in place
 
 The addon folder must be named exactly **`MiniGM`** and sit directly inside `Interface\AddOns\`:
@@ -29,7 +35,12 @@ The addon folder must be named exactly **`MiniGM`** and sit directly inside `Int
 
 The `Tele` subfolder is **not optional** — the teleport directory lives there, and the `.toc` loads it before the main file.
 
-A very common mistake is ending up with `AddOns\MiniGM\MiniGM\MiniGM.toc` after unzipping. WoW will not find that. The `.toc` must be one level inside `AddOns\MiniGM\`.
+Two ways this goes wrong from source:
+
+- GitHub's **Download ZIP** extracts to `MiniGM-main`. WoW requires the folder name to match the `.toc` name, so rename it to `MiniGM`.
+- Unzipping carelessly can leave you with `AddOns\MiniGM\MiniGM\MiniGM.toc`. The `.toc` must be exactly one level inside `AddOns\MiniGM\`.
+
+Neither happens with the release zip.
 
 ### PowerShell
 

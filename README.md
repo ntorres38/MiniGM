@@ -193,26 +193,25 @@ You don't need to port-forward a private realm. Tailscale or WireGuard with a su
 
 ## Install
 
-1. Download the ZIP — green **Code** button above, or from **Releases**.
-2. Extract it somewhere.
-3. Copy `MiniGM.toc`, `MiniGM.lua` and the whole `Tele` folder into a folder called `MiniGM` inside `Interface\AddOns`.
-4. Restart the client. `/reload` won't find a new addon.
-5. Type `/mgm`.
+1. Grab the zip from **[Releases](../../releases)**.
+2. Extract it straight into `<World of Warcraft>\Interface\AddOns\`.
+3. Restart the client. `/reload` won't find a new addon.
+4. Type `/mgm`.
 
-You want to end up with exactly this:
+That's it — the release zip already has the folder named correctly, so there's nothing to rename. You should end up with:
 
 ```
 <World of Warcraft>\Interface\AddOns\MiniGM\
     MiniGM.toc
     MiniGM.lua
     Tele\TeleportDB.lua
+    LICENSE
+    README.md
 ```
 
-**The folder has to be called `MiniGM`.** GitHub's ZIP extracts to `MiniGM-main`, and if you drag that straight into `AddOns` the client won't load it. Rename it, or copy the files out of it. The `.toc` filename has to match the folder name, which is a WoW rule and not something I can work around.
+**If you grab the source instead** (green **Code** button → Download ZIP), that one extracts to a folder called `MiniGM-main`. WoW needs the folder name to match the `.toc` name, so rename it to `MiniGM` or the client won't see it. The release zip exists so you don't have to think about this.
 
-**Don't skip the `Tele` folder.** That's where the 1,306 locations live. Without it the addon loads but the Tele tab reports the database is missing.
-
-The docs, LICENSE and CHANGELOG don't need copying. WoW ignores them.
+**Either way, don't lose the `Tele` folder.** That's where the 1,306 locations live. Without it the addon still loads, but the Tele tab will tell you the database is missing.
 
 You should see `MiniGM: v1.0.0-rc loaded`, and the Tele tab should report `loaded - 1306 locations in 143 zones`. If it says the database didn't load, the `Tele` folder didn't copy.
 

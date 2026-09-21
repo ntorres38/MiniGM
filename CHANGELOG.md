@@ -17,6 +17,11 @@ First public build. Everything below this entry is unreleased private developmen
   its box at x=26, so it rendered off-frame entirely. Now 668x372 with
   symmetrical 26px margins and the label anchored to the frame.
 - ADD Screenshots.
+- ADD A packaged release zip, so installing is "extract into AddOns" with no
+  rename. GitHub's own source zip extracts to `MiniGM-main`, which WoW will
+  not load. The release zip carries LICENSE as well - a release is
+  distribution, and GPLv3 asks for the licence to travel with the work.
+  Packaging steps are in CONTRIBUTING.md.
 - ADD A "First, some context" opener for readers who have never heard of any
   of this: what World of Warcraft was, why patch 3.3.5a matters, where
   private servers came from, and what AzerothCore is - its lineage, its

@@ -103,7 +103,9 @@ You do not need to port-forward a private realm. A mesh VPN (Tailscale, WireGuar
 
 ## 4. Installing
 
-The folder must be named exactly `MiniGM` and sit directly inside `Interface\AddOns\`:
+**Easiest:** download the zip from the repository's Releases page and extract it into `<World of Warcraft>\Interface\AddOns\`. It is already packaged with the right folder name.
+
+From source, the folder must be named exactly `MiniGM` and sit directly inside `Interface\AddOns\`:
 
 ```
 <World of Warcraft>\Interface\AddOns\MiniGM\
