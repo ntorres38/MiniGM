@@ -17,11 +17,14 @@ First public build. Everything below this entry is unreleased private developmen
   its box at x=26, so it rendered off-frame entirely. Now 668x372 with
   symmetrical 26px margins and the label anchored to the frame.
 - ADD Screenshots.
-- ADD A packaged release zip, so installing is "extract into AddOns" with no
-  rename. GitHub's own source zip extracts to `MiniGM-main`, which WoW will
-  not load. The release zip carries LICENSE as well - a release is
-  distribution, and GPLv3 asks for the licence to travel with the work.
-  Packaging steps are in CONTRIBUTING.md.
+- ADD A packaged release zip, `MiniGM-Addon-<version>.zip`, containing a
+  correctly named `MiniGM` folder so installing is "drag it into AddOns".
+  GitHub's own source zips do not work for this: **Download ZIP** gives
+  `MiniGM-main` and a release's "Source code (zip)" gives `MiniGM-1.0.0-rc`,
+  neither of which WoW will load. The `-Addon-` in the filename exists
+  because the naive name collides exactly with GitHub's auto-attached one.
+  The zip carries LICENSE too - a release is distribution, and GPLv3 asks
+  for the licence to travel with the work. Packaging steps in CONTRIBUTING.md.
 - ADD A "First, some context" opener for readers who have never heard of any
   of this: what World of Warcraft was, why patch 3.3.5a matters, where
   private servers came from, and what AzerothCore is - its lineage, its

@@ -193,11 +193,13 @@ You don't need to port-forward a private realm. Tailscale or WireGuard with a su
 
 ## Install
 
-1. Download **`MiniGM-1.0.0-rc.zip`** from [Releases](../../releases).
+1. Go to [Releases](../../releases) and download **`MiniGM-Addon-1.0.0-rc.zip`**.
 2. Open it. There's one folder inside, called `MiniGM`.
 3. Drag that folder into `<World of Warcraft>\Interface\AddOns\`.
 4. Restart the client. `/reload` won't find a new addon.
 5. Type `/mgm`.
+
+> **Take the file with `Addon` in the name.** GitHub also puts a "Source code (zip)" on every release. That one is the whole repository and the folder inside it is called `MiniGM-1.0.0-rc`, which WoW won't load — the folder has to be named `MiniGM` to match the `.toc`. The `Addon` zip is already packaged correctly.
 
 You should see `MiniGM: v1.0.0-rc loaded`, and the Tele tab should say `loaded - 1306 locations in 143 zones`.
 

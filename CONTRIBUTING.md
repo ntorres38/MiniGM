@@ -56,10 +56,12 @@ Remove-Item -Recurse -Force $stage -EA SilentlyContinue
 New-Item -ItemType Directory -Force -Path "$stage\MiniGM\Tele" | Out-Null
 Copy-Item MiniGM.toc, MiniGM.lua, LICENSE, README.md "$stage\MiniGM"
 Copy-Item Tele\TeleportDB.lua "$stage\MiniGM\Tele"
-Compress-Archive -Force -Path "$stage\MiniGM" -DestinationPath "..\MiniGM-$v.zip"
+Compress-Archive -Force -Path "$stage\MiniGM" -DestinationPath "..\MiniGM-Addon-$v.zip"
 ```
 
 Then draft a release against the matching tag and attach that file.
+
+**The `-Addon-` in the filename is not decoration.** GitHub auto-attaches a "Source code (zip)" to every release, and for tag `v1.0.0-rc` that file is named `MiniGM-1.0.0-rc.zip` — identical to what you would naturally call the packaged one. Two files with the same name on the same page, one of which does not work, is how people end up with a folder called `MiniGM-1.0.0-rc` in their AddOns directory wondering why nothing loaded.
 
 `LICENSE` is in the zip deliberately. A release is distribution, and GPLv3 asks for the licence text to travel with the work. `README.md` is there so anyone who only has the zip knows where it came from. WoW ignores both.
 
