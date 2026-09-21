@@ -25,9 +25,7 @@ So I built a small HUD that plays alongside you and doesn't make you stop what y
 > **I'm a cybersecurity professional, not a developer.** I built this with [Claude](https://claude.ai). The design calls, the bug reports and every hour of in-game testing are mine, but I didn't hand-write the Lua. There's [more on what that meant](#how-this-was-built) at the bottom, including the two bugs that shipped and only got caught by playing the game.
 
 <p align="center">
-  <img src="docs/images/hud.png" alt="The MiniGM HUD tab" width="286">
-  &nbsp;
-  <img src="docs/images/tele.png" alt="The teleport picker - continent, zone and location columns" width="580">
+  <img src="docs/images/hud.png" alt="The MiniGM HUD tab" width="320">
 </p>
 
 ---
@@ -61,9 +59,14 @@ Three columns: continent, zone, location. All of them stay clickable, so the sta
 143 zones, 83 maps, split into Eastern Kingdoms (391), Kalimdor (337), Outland (276), Northrend (53), Dungeons & Raids (91), Battlegrounds (21), Flight Masters (87) and Other (50).
 
 <p align="center">
-  <img src="docs/images/tele-tab.png" alt="The Tele tab - choose Self, Target, Party or Raid" width="360">
+  <img src="docs/images/tele-tab.png" alt="The Tele tab - choose Self, Target, Party or Raid" width="340">
 </p>
-<p align="center"><sub>Choose who's going, then the picker opens.</sub></p>
+<p align="center"><sub>First, who's going.</sub></p>
+
+<p align="center">
+  <img src="docs/images/tele.png" alt="The teleport picker - continent, zone and location columns, with a search box" width="820">
+</p>
+<p align="center"><sub>Then the picker opens on the zone you're standing in. Elwynn Forest is selected here because that's where I was.</sub></p>
 
 ### Two things people notice first
 
