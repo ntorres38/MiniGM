@@ -17,6 +17,12 @@ First public build. Everything below this entry is unreleased private developmen
   its box at x=26, so it rendered off-frame entirely. Now 668x372 with
   symmetrical 26px margins and the label anchored to the frame.
 - ADD Screenshots.
+- ADD An introduction to AzerothCore for readers who have never heard of it,
+  covering what it is, its lineage, and why modules like mod-playerbots make
+  a small private realm workable at all.
+- ADD An explicit statement that this project does not link to, host or help
+  anyone obtain a game client. MiniGM is an interface addon; the client is a
+  separate matter.
 - ADD A Commands section to the README. An earlier draft had one and it was
   lost in a rewrite, leaving `/mgm runspeed` as the only slash command
   mentioned anywhere - sitting in a table of buttons, where it read as if

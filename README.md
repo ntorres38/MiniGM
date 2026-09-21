@@ -14,6 +14,29 @@
 
 ---
 
+## First, what's AzerothCore?
+
+*Skip this if you already run a realm.*
+
+World of Warcraft normally needs Blizzard's servers. [**AzerothCore**](https://www.azerothcore.org/) is an open-source one you run yourself — a complete, free implementation of the server side of the game, targeting patch **3.3.5a (Wrath of the Lich King)**. You install it on a spare PC or a small home server, point a 3.3.5a client at it, and you have your own realm.
+
+It's GPLv2 and community-maintained, and it comes from a long line of the same effort: MaNGOS, then TrinityCore, then SunwellCore, which AzerothCore forked from in 2016. The project describes itself as a learning resource as much as a game server, and that's fair — there's a lot of well-documented C++ in there for anyone curious how an MMO actually works under the hood.
+
+**Why it's worth caring about**
+
+- **It's your realm.** Your rates, your rules, your patch. Nothing expires, nothing gets sunset, nobody changes the game out from under you.
+- **It's free and it's yours to modify.** Open source, actively maintained, with a large [module catalogue](https://www.azerothcore.org/catalogue.html) the community keeps adding to.
+- **It runs on modest hardware.** A used office desktop is genuinely enough. Mine is a second-hand OptiPlex.
+- **Modules make small realms viable.** This is the part people don't expect. [mod-playerbots](https://github.com/liyunfan1223/mod-playerbots) fills your party and raid with AI-controlled characters, so four people — or one — can run five-mans and raids that normally need twenty-five. On a server with a handful of players, that's the difference between a world you can play and an empty one.
+
+**MiniGM needs one of these.** It's a client-side addon that sends GM commands to a server. Without an AzerothCore realm where you hold GM rights, it has nothing to talk to. If you're setting up from scratch, AzerothCore's own [installation guide](https://www.azerothcore.org/wiki/installation) is the place to start.
+
+> **On the game client: you're on your own.** Connecting to any realm needs a 3.3.5a client. **I don't link to one, host one, mirror one, or point anyone at where to find one, and please don't ask me to.** AzerothCore is open-source server software and that's what's being discussed here. The client is a separate matter and it's yours to sort out.
+>
+> Nothing in this repository is a game client or any part of one. It's an interface addon — plain Lua text files that run inside a client you already have, the same as any other WoW addon.
+
+---
+
 ## Why this exists
 
 I run a small AzerothCore realm for myself and my family, and I play on it. Most of the time I'm a player. Occasionally I need to be a GM: fly somewhere, heal up, unstick an alt, drag a party of bots across the map.

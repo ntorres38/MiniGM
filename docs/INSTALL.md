@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| Client | WoW **3.3.5a** (build 12340). The `.toc` declares Interface **30300**; do not change it. |
+| Client | WoW **3.3.5a** (build 12340). The `.toc` declares Interface **30300**; do not change it. **This project does not link to, host or help you obtain a game client.** MiniGM is an interface addon — plain Lua that runs inside a client you already have. |
 | Server | **AzerothCore**. Other WotLK cores use different command syntax and are untested. |
 | Account | A gmlevel high enough for the commands you use — see [COMMANDS.md](COMMANDS.md). |
 | Optional | **mod-playerbots** for the Bots section and Party/Raid teleport. |

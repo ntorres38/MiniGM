@@ -78,7 +78,7 @@ Outgoing messages are queued at **one per 0.4 seconds** (see §14). Every one is
 
 | | |
 |---|---|
-| **Client** | WoW **3.3.5a** (build 12340). The `.toc` declares Interface **30300**. Do not change it. |
+| **Client** | WoW **3.3.5a** (build 12340). The `.toc` declares Interface **30300**. Do not change it. This project does not link to, host or help you obtain a game client — that is yours to sort out. |
 | **Server** | **AzerothCore.** Other WotLK cores (TrinityCore, MaNGOS forks) use different command syntax and are untested. |
 | **gmlevel** | **2** for almost everything. **3** for `.character level` only. |
 | **Dependencies** | None. |
