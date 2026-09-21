@@ -17,9 +17,11 @@ First public build. Everything below this entry is unreleased private developmen
   its box at x=26, so it rendered off-frame entirely. Now 668x372 with
   symmetrical 26px margins and the label anchored to the frame.
 - ADD Screenshots.
-- ADD An introduction to AzerothCore for readers who have never heard of it,
-  covering what it is, its lineage, and why modules like mod-playerbots make
-  a small private realm workable at all.
+- ADD A "First, some context" opener for readers who have never heard of any
+  of this: what World of Warcraft was, why patch 3.3.5a matters, where
+  private servers came from, and what AzerothCore is - its lineage, its
+  licence, and why modules like mod-playerbots make a small realm workable
+  at all. Figures cited are sourced.
 - ADD An explicit statement that this project does not link to, host or help
   anyone obtain a game client. MiniGM is an interface addon; the client is a
   separate matter.

@@ -14,22 +14,30 @@
 
 ---
 
-## First, what's AzerothCore?
+## First, some context
 
-*Skip this if you already run a realm.*
+*Skip to [Why this exists](#why-this-exists) if you already run a realm.*
 
-World of Warcraft normally needs Blizzard's servers. [**AzerothCore**](https://www.azerothcore.org/) is an open-source one you run yourself — a complete, free implementation of the server side of the game, targeting patch **3.3.5a (Wrath of the Lich King)**. You install it on a spare PC or a small home server, point a 3.3.5a client at it, and you have your own realm.
+**World of Warcraft** launched in 2004 and became the biggest subscription game ever made. Guinness still lists it that way — [12 million subscribers at its peak](https://www.guinnessworldrecords.com/world-records/116965-most-popular-subscription-based-videogame-ever) in October 2010. For a lot of people it was *the* online game of a decade, and for plenty of us it's where our friends were.
 
-It's GPLv2 and community-maintained, and it comes from a long line of the same effort: MaNGOS, then TrinityCore, then SunwellCore, which AzerothCore forked from in 2016. The project describes itself as a learning resource as much as a game server, and that's fair — there's a lot of well-documented C++ in there for anyone curious how an MMO actually works under the hood.
+**Wrath of the Lich King**, the 2008 expansion, is the one many players point to as the high-water mark. Patch **3.3.5a** is its final build, and it's the version everything below is about.
+
+Games move on, though. Expansions replace each other, systems get redesigned, and the version you spent years in simply stops existing. That's most of why server emulation happened. People wanted a specific version of the game to stay playable, so they worked out how to run the server side themselves, and that effort has been going almost as long as the game has. It's where private servers came from.
+
+### AzerothCore
+
+[**AzerothCore**](https://www.azerothcore.org/) is where a lot of that work ended up. It's an open-source game server you run yourself — a complete, free implementation of the server side, targeting 3.3.5a. You install it on a spare PC or a small home box, point a 3.3.5a client at it, and you have your own realm.
+
+It's GPLv2 and community-maintained, and it carries that whole lineage with it: MaNGOS, then TrinityCore, then SunwellCore, which AzerothCore forked from in 2016. The project describes itself as a learning resource as much as a game server, and that's fair — there's a lot of well-documented C++ in there for anyone curious how an MMO actually works underneath.
 
 **Why it's worth caring about**
 
-- **It's your realm.** Your rates, your rules, your patch. Nothing expires, nothing gets sunset, nobody changes the game out from under you.
-- **It's free and it's yours to modify.** Open source, actively maintained, with a large [module catalogue](https://www.azerothcore.org/catalogue.html) the community keeps adding to.
+- **It's your realm.** Your rates, your rules, your patch. Nothing expires, nothing gets sunset, nobody redesigns the game out from under you.
+- **It's free and yours to modify.** Open source, actively maintained, with a large [module catalogue](https://www.azerothcore.org/catalogue.html) the community keeps growing.
 - **It runs on modest hardware.** A used office desktop is genuinely enough. Mine is a second-hand OptiPlex.
-- **Modules make small realms viable.** This is the part people don't expect. [mod-playerbots](https://github.com/liyunfan1223/mod-playerbots) fills your party and raid with AI-controlled characters, so four people — or one — can run five-mans and raids that normally need twenty-five. On a server with a handful of players, that's the difference between a world you can play and an empty one.
+- **Modules make small realms viable.** This is the part people don't expect. [mod-playerbots](https://github.com/liyunfan1223/mod-playerbots) fills your party and raid with AI-controlled characters, so four people — or one — can run five-mans and raids built for twenty-five. On a server with a handful of players, that's the difference between a world you can play in and an empty one.
 
-**MiniGM needs one of these.** It's a client-side addon that sends GM commands to a server. Without an AzerothCore realm where you hold GM rights, it has nothing to talk to. If you're setting up from scratch, AzerothCore's own [installation guide](https://www.azerothcore.org/wiki/installation) is the place to start.
+**MiniGM needs one of these.** It's a client-side addon that sends GM commands to a server. Without an AzerothCore realm where you hold GM rights, it has nothing to talk to. Setting up from scratch, AzerothCore's own [installation guide](https://www.azerothcore.org/wiki/installation) is where to start.
 
 > **On the game client: you're on your own.** Connecting to any realm needs a 3.3.5a client. **I don't link to one, host one, mirror one, or point anyone at where to find one, and please don't ask me to.** AzerothCore is open-source server software and that's what's being discussed here. The client is a separate matter and it's yours to sort out.
 >
