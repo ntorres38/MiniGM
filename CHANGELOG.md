@@ -1,0 +1,106 @@
+# Changelog
+
+WoW 3.3.5a (Interface 30300), AzerothCore.
+
+---
+
+## 1.0.0-rc — first public release candidate
+
+First public build. Everything below this entry is unreleased private development, kept because the *reasons* are worth reading — several entries document server behaviour that is not written down anywhere else.
+
+- ADD Full documentation set — install, user guide, complete command inventory, architecture, teleport data provenance, attribution, and a single-file master guide written to be given to an LLM.
+- ADD GPLv3 licence and attribution, with the AzerothAdmin → TrinityAdmin → MangAdmin lineage recorded.
+- CHANGE Slash commands are `/mgm` and `/minigm`.
+- FIX Teleport picker layout. At 640px it could not contain its own three
+  columns - `26 + 196x3 + 14x2 = 642` overflowed the frame before the 12px
+  border inset was counted - and the Search label was anchored to the left of
+  its box at x=26, so it rendered off-frame entirely. Now 668x372 with
+  symmetrical 26px margins and the label anchored to the frame.
+- ADD Screenshots.
+- CHANGE The panel always opens on the **HUD** tab. Remembering the last tab
+  saved one click and cost a confusing login every session - you are never
+  mid-task at login, so landing on a near-empty Tele tab just reads as broken.
+
+---
+
+## Pre-release development history
+
+Unreleased. Version numbers here are internal build numbers, not public releases.
+
+### 3.4 Beta
+- CHANGE The panel and the teleport picker now scale **independently**. 3.3 made the picker follow the panel; each now owns its scale, position and grip.
+- ADD Size grip on the teleport picker.
+- ADD `/mgm telescale <0.5-2>`.
+- CHANGE `/mgm reset` resets both scales and both positions.
+
+### 3.3 Beta
+- ADD **Size grip** on the bottom-right corner. It scales rather than resizes: every button sits at a fixed pixel offset, so a real resize would leave gaps instead of reflowing. Clamped 0.5–2.0, top-left stays pinned, size remembered.
+- FIX Minimap tooltip opened over the minimap itself. Now drops down-left.
+- FIX The Minimap icon checkbox is centred under the title, measured as a checkbox+label pair after the first draw.
+
+### 3.2 Beta
+- FIX **Party/Raid/Target teleport did not move bots.** 3.1 sent one `.summon <name>` per member. That is a GM command aimed at *players*: the server accepts it and prints "You are summoning [X]", and the playerbot never acts on it. Bots obey the module's own `summon` in party or raid chat, which also moves the **whole group in one message**. Party/Raid now send `summon` to group chat; Target sends it whispered (bots) plus `.summon` (humans).
+- NOTE Human party members do not obey the chat `summon`. Bring a human with Target.
+- ADD **Minimap icon**, toggled from the title strip. Left-click opens/closes, shift-drag moves it, shift-right-click hides it. Position and state remembered. No LibDBIcon.
+- ADD `/mgm minimap`.
+- CHANGE The send queue carries a whisper recipient.
+
+### 3.1 Beta
+- ADD **Tele tab.** Who first — Self / Target / Party / Raid — then a centre-screen three-column picker opening on the zone you are standing in. Continent → Zone → Location, every column clickable.
+- ADD Search box filtering all 1,306 locations by name across every zone.
+- ADD `Tele\TeleportDB.lua` — **1,306 locations, 143 zones, 8 groups, 83 maps**, derived from AzerothAdmin's `Data/TeleportTable.lua` (GPLv3) and regrouped from its 12 branches. 9 corrupt coordinate strings repaired, all listed in the file header.
+- ADD The picker is its own frame on UIParent: centred, separately draggable, Esc closes it.
+
+### 3.0.1 Beta
+- FIX Title still overflowed the header brackets. 3.0 padded the header by a fixed +72px, which for a ~160px title produced a *narrower* header than the 240px it replaced. The art's end-caps scale with the texture, so the width must be a multiple of the title width.
+- ADD `/mgm titlefit <1.0-4.0>` to tune that multiplier live.
+- FIX The Tele tab reported a successful empty load as "database loaded, empty", which reads as a failure. Success now says "loaded OK" in green.
+
+### 3.0 Beta
+- ADD Tab bar (HUD · Tele) below the window, in the existing button style. Tabs drag and scale with the window and stay usable while collapsed.
+- ADD `Tele\TeleportDB.lua`, loaded before the main file. Empty in 3.0; the Tele tab reports what it found so a failed install is visible immediately.
+- ADD Active tab remembered.
+- FIX Title ran past the header brackets.
+- CHANGE Every HUD widget moved into its own page frame. No behavioural change.
+- ADD GPLv3 LICENSE, README and this changelog.
+
+### 2.1 Beta
+- ADD Flight failsafe: a watchdog checks `IsMounted()` every 3s, re-applies the mount aura if stripped, waits out combat, and falls back to plain GM fly after three attempts.
+
+### 2.0 Beta
+- ADD Mount-aura flight. `.gm fly` alone ignores all speed rates; flight speed only applies while a mount aura is active, so Fly ON also sends `.modify mount <displayID> <speed>`.
+- ADD `/mgm flyspeed`, `/mgm flymount`.
+
+### 1.9 Beta
+- ADD `/mgm runspeed <n>`; default reverted to 1.5.
+
+### 1.8 Beta
+- Testing and configuration only; no source snapshot kept.
+
+### 1.7 Beta
+- FIX Chat throttle silently dropped bursts — three `SendChatMessage` calls in one frame delivered only two. Everything outgoing now goes through a queue at one message per 0.4 s.
+
+### 1.6 Beta
+- ADD Fly speed control.
+
+### 1.5 Beta
+- ADD Esc closes pop-out panels.
+- ADD `/mgm addalt a,b,c` accepts a comma-separated list.
+
+### 1.4 Beta
+- FIX Level can only go up. `.character level` de-levels as happily as it raises; that is now refused.
+
+### 1.3 Beta
+- ADD Modify Char panel — set level, add gold. Refuses with no target, and demands typing `Accept` when the target is you.
+
+### 1.2 Beta
+- CHANGE Only characters you have logged into are remembered as alts.
+- ADD Right-click an alt to forget it.
+- FIX Enter accepts popups (`EditBoxOnEnterPressed`).
+
+### 1.1 Beta
+- CHANGE Capitalised class labels.
+- ADD `/mgm reset` also resets scale.
+
+### 1.0 Beta
+- First build. Red/gold dialog, draggable, collapsible, `/mgm` to toggle, no minimap icon by design.
