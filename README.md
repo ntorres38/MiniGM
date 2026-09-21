@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/server-AzerothCore-1E8CBE" alt="AzerothCore">
   <img src="https://img.shields.io/badge/version-1.0.0--rc-F0A020" alt="1.0.0-rc">
   <img src="https://img.shields.io/badge/license-GPLv3-3DA639" alt="GPLv3">
-  <img src="https://img.shields.io/badge/dependencies-none-6E7781" alt="No dependencies">
+  <img src="https://img.shields.io/badge/libraries-none-6E7781" alt="No libraries">
   <img src="https://img.shields.io/badge/built%20with-AI%20assistance-8A63D2" alt="Built with AI assistance">
 </p>
 
@@ -18,7 +18,7 @@
 
 I run a small AzerothCore realm for myself and my family, and I play on it. Most of the time I'm a player. Occasionally I need to be a GM: fly somewhere, heal up, unstick an alt, drag a party of bots across the map.
 
-There are good admin suites for AzerothCore. [AzerothAdmin](https://github.com/superstyro/AzerothAdmin) is the one I used, and MiniGM's teleport data comes from it. But those tools are built for the person *running* the server — spawning NPCs, editing gameobjects, working tickets, browsing the item database. When what you actually want is to fly to Goldshire and heal, opening an 800×440 console with eight tabs is a lot.
+There are good admin suites for AzerothCore. [AzerothAdmin](https://github.com/superstyro/AzerothAdmin) is the one I used, and MiniGM's teleport data comes from it. But those tools are built for the person *running* the server: spawning NPCs, editing gameobjects, working tickets, browsing the item database. When all you want is to fly to Goldshire and heal yourself, a full eight-tab admin window gets in the way more than it helps.
 
 So I built a small HUD that plays alongside you and doesn't make you stop what you're doing. It's intuitive, moveable and scalable, it stays out of the way, and it remembers where you left it.
 
@@ -38,7 +38,7 @@ So I built a small HUD that plays alongside you and doesn't make you stop what y
 
 | Section | Buttons | Notes |
 |---|---|---|
-| **Movement** | Speed *n*× · Speed normal | Tunable multiplier. Applies to your target if you have one, otherwise to you. |
+| **Movement** | Speed *n*× · Speed normal | Defaults to 1.5×. `/mgm runspeed <n>` changes it and the button relabels itself. Hits your target if you have one, otherwise you. |
 | | Fly ON · Fly OFF | GM flight that's actually fast. [This took a while to work out.](#flight-speed-is-a-lie) |
 | **Survival** | God ON · God OFF | `.cheat god`, always on you |
 | | Full heal | An actual heal, not the max-HP hack you'll find in old macro guides |
@@ -60,6 +60,11 @@ Three columns: continent, zone, location. All of them stay clickable, so the sta
 
 143 zones, 83 maps, split into Eastern Kingdoms (391), Kalimdor (337), Outland (276), Northrend (53), Dungeons & Raids (91), Battlegrounds (21), Flight Masters (87) and Other (50).
 
+<p align="center">
+  <img src="docs/images/tele-tab.png" alt="The Tele tab - choose Self, Target, Party or Raid" width="360">
+</p>
+<p align="center"><sub>Choose who's going, then the picker opens.</sub></p>
+
 ### Two things people notice first
 
 **Drag the corners.** Both windows have a grip on the bottom-right. Drag it and everything scales together, and the panel and picker size independently. If you play at 1440p you'll want this about four seconds after installing.
@@ -69,15 +74,15 @@ It scales instead of resizing because every button sits at a hardcoded pixel off
 **It learns your alts.** You never type a character name. MiniGM notes every character you log into, and Add alt lists them back to you. Click to log one in as a bot, right-click to forget it. If you run ten alts as a standing bot party, this saves you remembering how you spelled *Parriahshamy* at 1am.
 
 <p align="center">
-  <img src="docs/images/altlist.png" alt="The Add alt flyout, listing remembered characters" width="300">
-  &nbsp;&nbsp;
-  <img src="docs/images/tele-tab.png" alt="The Tele tab - choose Self, Target, Party or Raid" width="330">
-  &nbsp;&nbsp;
-  <img src="docs/images/minimap.png" alt="The minimap icon tooltip" width="270">
+  <img src="docs/images/altlist.png" alt="The Add alt flyout, listing remembered characters" width="320">
 </p>
-<p align="center"><sub>Alts remembered for you · who-first teleporting · the optional minimap icon</sub></p>
+<p align="center"><sub>Every character you've logged into, listed back to you.</sub></p>
 
 ### Everything else
+
+<p align="center">
+  <img src="docs/images/minimap.png" alt="The minimap icon tooltip" width="300">
+</p>
 
 There's an optional minimap icon (left-click opens, shift-drag moves it, shift-right-click hides it). You can collapse the panel to its title bar, and the tabs still work collapsed. Esc closes the picker. Positions, sizes, minimap angle, alt list and speed settings all survive a relog.
 
@@ -106,8 +111,8 @@ Messages queue at one per 0.4 seconds, and each one is echoed to your chat frame
 | **Client** | 3.3.5a, build 12340. Interface 30300. |
 | **Server** | AzerothCore. Other WotLK cores have different command syntax and are untested. |
 | **gmlevel** | 2 for nearly everything. 3 for `.character level`. |
-| **Dependencies** | None. No Ace3, no LibStub, no LibDBIcon. Two Lua files and a `.toc`. |
-| **Optional** | [mod-playerbots](https://github.com/liyunfan1223/mod-playerbots) for the Bots section and Party/Raid teleport. Everything else works without it. |
+| **Addon libraries** | None. No Ace3, no LibStub, no LibDBIcon. Two Lua files and a `.toc`. |
+| **Server module** | [mod-playerbots](https://github.com/liyunfan1223/mod-playerbots) is **required for the Bots section and for Party/Raid teleport**. Without it those buttons send commands your server won't understand. Movement, survival, combat, character and Self/Target teleport all work fine without it. |
 
 ### Server hardware
 
@@ -128,6 +133,14 @@ You don't need to port-forward a private realm. Tailscale or WireGuard with a su
 
 ## Install
 
+1. Download the ZIP — green **Code** button above, or from **Releases**.
+2. Extract it somewhere.
+3. Copy `MiniGM.toc`, `MiniGM.lua` and the whole `Tele` folder into a folder called `MiniGM` inside `Interface\AddOns`.
+4. Restart the client. `/reload` won't find a new addon.
+5. Type `/mgm`.
+
+You want to end up with exactly this:
+
 ```
 <World of Warcraft>\Interface\AddOns\MiniGM\
     MiniGM.toc
@@ -135,17 +148,11 @@ You don't need to port-forward a private realm. Tailscale or WireGuard with a su
     Tele\TeleportDB.lua
 ```
 
-The `Tele` subfolder isn't optional. That's where the teleport data lives.
+**The folder has to be called `MiniGM`.** GitHub's ZIP extracts to `MiniGM-main`, and if you drag that straight into `AddOns` the client won't load it. Rename it, or copy the files out of it. The `.toc` filename has to match the folder name, which is a WoW rule and not something I can work around.
 
-```powershell
-$src = "<path to this repo>"
-$dst = "C:\Games\<YourClient>\Interface\AddOns\MiniGM"
-New-Item -ItemType Directory -Force -Path "$dst\Tele" | Out-Null
-Copy-Item -Force "$src\MiniGM.lua","$src\MiniGM.toc" $dst
-Copy-Item -Force "$src\Tele\TeleportDB.lua" "$dst\Tele"
-```
+**Don't skip the `Tele` folder.** That's where the 1,306 locations live. Without it the addon loads but the Tele tab reports the database is missing.
 
-Restart the client properly. `/reload` won't find a new addon. Then type `/mgm`.
+The docs, LICENSE and CHANGELOG don't need copying. WoW ignores them.
 
 You should see `MiniGM: v1.0.0-rc loaded`, and the Tele tab should report `loaded - 1306 locations in 143 zones`. If it says the database didn't load, the `Tele` folder didn't copy.
 
@@ -185,7 +192,7 @@ Each of these ate hours. They're written down so they don't eat yours.
 
 Flight speed only applies while a mount aura is up. So Fly ON sends `.gm fly on` and then `.modify mount <displayID> <speed>`. The mount is temporary, an aura and a model rather than a learned mount, so your riding progression is untouched.
 
-A watchdog checks `IsMounted()` every 3 seconds, because the aura gets stripped indoors and in instances. It waits out combat, retries three times, then gives up and falls back to plain GM fly so you don't drop out of the sky.
+A watchdog checks `IsMounted()` every 3 seconds, because the aura can get dropped and you won't always notice. It isn't consistent — I've flown around inside the Stormwind auction house with it holding fine — but when it does go, you lose your speed silently and wonder why you've slowed down. The watchdog waits out combat, retries three times, then gives up and falls back to plain GM fly so you don't drop out of the sky.
 
 > **Don't use displayID `28082`.** The flying carpet crashed my worldserver the moment it was applied. systemd brought it back 15 seconds later and about 15 minutes of unsaved play was gone. The same speed value with `28652` is fine, so it was the model, not the number. MiniGM defaults to `28652`.
 

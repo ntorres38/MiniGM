@@ -17,6 +17,11 @@ First public build. Everything below this entry is unreleased private developmen
   its box at x=26, so it rendered off-frame entirely. Now 668x372 with
   symmetrical 26px margins and the label anchored to the frame.
 - ADD Screenshots.
+- FIX Docs overstated the mount-aura failsafe. They said the aura "gets
+  stripped indoors and in instances" as a flat fact; it is not that
+  predictable - flying inside the Stormwind auction house held fine. The
+  watchdog is there because the aura can drop silently, not because any
+  particular place always drops it.
 - CHANGE The panel always opens on the **HUD** tab. Remembering the last tab
   saved one click and cost a confusing login every session - you are never
   mid-task at login, so landing on a near-empty Tele tab just reads as broken.

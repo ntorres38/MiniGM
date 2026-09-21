@@ -312,9 +312,10 @@ local function flyMount()
     return MiniGMDB.flyMount or 28652      -- Armored Ebon Gryphon
 end
 
--- Failsafe: the mount aura (which is what makes flight speed apply) can fail
--- or be stripped - indoors, instances, combat. The watchdog re-applies it a
--- few times, then falls back to plain GM fly and says so.
+-- Failsafe: the mount aura (which is what makes flight speed apply) can be
+-- dropped. Not reliably reproducible - flying inside the Stormwind auction
+-- house held fine - but when it goes you lose speed silently. The watchdog
+-- re-applies it a few times, then falls back to plain GM fly and says so.
 local flyActive, flyTries, flyNextCheck = false, 0, 0
 
 local function applyFlyMount()

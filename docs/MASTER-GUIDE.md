@@ -201,7 +201,7 @@ Rate reference: `1.0` base flight (7.0 y/s) · `1.5` slow mount · `2.8` epic (2
 
 > 🔴 **Never use displayID `28082`** (flying carpet). It crashed a worldserver the instant it was applied; systemd restarted it 15 seconds later and ~15 minutes of unsaved play was lost. The same speed with `28652` is fine — the model was the trigger.
 
-**The watchdog.** The mount aura gets stripped indoors and in instances. Every 3 seconds MiniGM checks `IsMounted()`. If the aura is gone it waits out combat, re-applies up to 3 times, then gives up, tells you, and guarantees plain `.gm fly on` so you do not fall. Zoning or relogging clears GM fly server-side, so the watchdog stands down on `PLAYER_ENTERING_WORLD`.
+**The watchdog.** The mount aura can be dropped, though not predictably — flying inside the Stormwind auction house held fine. Every 3 seconds MiniGM checks `IsMounted()`. If the aura is gone it waits out combat, re-applies up to 3 times, then gives up, tells you, and guarantees plain `.gm fly on` so you do not fall. Zoning or relogging clears GM fly server-side, so the watchdog stands down on `PLAYER_ENTERING_WORLD`.
 
 #### Fly OFF
 

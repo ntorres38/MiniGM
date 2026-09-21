@@ -73,7 +73,7 @@ Sends two commands:
 
 > **🔴 Never use displayID `28082`** (flying carpet). It crashed a worldserver at the moment it was applied. The server was restarted by systemd 15 seconds later and roughly 15 minutes of unsaved play was lost. The same speed value with `28652` works fine, so the model was the trigger, not the number.
 
-**The watchdog.** The mount aura can be stripped — indoors, in instances, sometimes in combat. Every 3 seconds MiniGM checks `IsMounted()`. If the aura is gone it waits out combat, re-applies up to 3 times, then gives up, tells you, and guarantees plain `.gm fly on` so you at least do not fall. Zoning or relogging clears GM fly server-side, so the watchdog stands down on `PLAYER_ENTERING_WORLD`.
+**The watchdog.** The mount aura can be dropped, though not predictably — flying inside the Stormwind auction house held fine. Every 3 seconds MiniGM checks `IsMounted()`. If the aura is gone it waits out combat, re-applies up to 3 times, then gives up, tells you, and guarantees plain `.gm fly on` so you at least do not fall. Zoning or relogging clears GM fly server-side, so the watchdog stands down on `PLAYER_ENTERING_WORLD`.
 
 ### Fly OFF
 
