@@ -26,7 +26,7 @@
 ----------------------------------------------------------------------]]
 
 local ADDON   = "MiniGM"
-local VERSION = "1.0.0"
+local VERSION = "1.1.0"
 local FRAME_H = 378
 
 local GOLD  = "|cffffd100"
@@ -75,8 +75,23 @@ local function queueSend(text, channel, to)
     table.insert(sendQueue, { text = text, channel = channel, to = to })
 end
 
+-- /say is blocked by the client while you are dead. A whisper to yourself
+-- is not, and the server parses "." commands out of a whisper exactly as it
+-- does out of /say. So: alive -> /say, dead -> whisper self.
 local function cmd(text)
-    queueSend(text, "SAY")
+    if UnitIsDeadOrGhost("player") then
+        queueSend(text, "WHISPER", UnitName("player"))
+    else
+        queueSend(text, "SAY")
+    end
+end
+
+-- same idea for the secure macro buttons, whose text is fixed at click time:
+-- always whisper yourself, which works alive or dead
+local function selfChat()
+    local me = UnitName("player")
+    if me and me ~= "" and me ~= "Unknown" then return "/w " .. me .. " " end
+    return "/say "
 end
 
 -- party/raid chat (bots listen there); warns if solo
@@ -122,6 +137,12 @@ local function forgetAlt(name)
     end
     return false
 end
+
+-- a name typed into "Type a name..." becomes an alt only once that character
+-- actually joins the party. Random bots arrive via addclass and never pass
+-- through here, so they are never remembered. A typo never joins, so it is
+-- never remembered either. Works across accounts and factions.
+local pendingAlt, pendingAt
 
 ----------------------------------------------------------------------
 -- main frame (Blizzard red/gold dialog look)
@@ -386,11 +407,12 @@ local heal = macroButton("MiniGMHeal", "Full heal",
 local function updateHealMacro()
     if InCombatLockdown() then return end
     local maxHP = UnitHealthMax("player") or 100
-    local text = "/target [noexists] player\n/say .modify hp " .. maxHP
+    local w = selfChat()
+    local text = "/target [noexists] player\n" .. w .. ".modify hp " .. maxHP
     if UnitPowerType("player") == 0 then
         local maxMana = UnitPowerMax("player", 0) or 0
         if maxMana > 0 then
-            text = text .. "\n/say .modify mana " .. maxMana
+            text = text .. "\n" .. w .. ".modify mana " .. maxMana
         end
     end
     heal:SetAttribute("macrotext", text)
@@ -410,9 +432,15 @@ end, "Revives the selected player/bot.")
 ----------------------------------------------------------------------
 section("Group")
 
-macroButton("MiniGMReviveAll", "Revive all",
+local reviveAll = macroButton("MiniGMReviveAll", "Revive all",
     "/tar player\n/s .revive\n/p revive",
-    "Revives you (.revive on yourself) and tells the group's bots to revive.")
+    "Revives you (.revive on yourself) and tells the group's bots to revive.\nWorks while dead.")
+
+local function updateReviveMacro()
+    if InCombatLockdown() then return end
+    reviveAll:SetAttribute("macrotext",
+        "/tar player\n" .. selfChat() .. ".revive\n/p revive")
+end
 
 button("Maint / Gear", function()
     local inRaid  = (GetNumRaidMembers and GetNumRaidMembers() or 0) > 0
@@ -695,6 +723,7 @@ local function acceptAddAlt(dialog)
     if name == "" then return end
     MiniGMDB.lastAlt = name
     cmd(".playerbots bot add " .. name)
+    pendingAlt, pendingAt = name, GetTime()
 end
 
 local function acceptRemoveBot(dialog)
@@ -1527,6 +1556,8 @@ ev:RegisterEvent("UNIT_MAXHEALTH")
 ev:RegisterEvent("PLAYER_REGEN_ENABLED")
 ev:RegisterEvent("PLAYER_TARGET_CHANGED")
 ev:RegisterEvent("PLAYER_ENTERING_WORLD")
+ev:RegisterEvent("PARTY_MEMBERS_CHANGED")
+ev:RegisterEvent("RAID_ROSTER_UPDATE")
 ev:SetScript("OnEvent", function(self, event, unit)
     if event == "PLAYER_ENTERING_WORLD" then
         flyActive = false            -- zoning/relog clears GM fly server-side
@@ -1550,6 +1581,27 @@ ev:SetScript("OnEvent", function(self, event, unit)
         updateSpeedButton()
         say("v" .. VERSION .. " loaded. " .. GOLD .. "/mgm" .. R .. " to show/hide.")
         updateHealMacro()
+        updateReviveMacro()
+    elseif event == "PARTY_MEMBERS_CHANGED" or event == "RAID_ROSTER_UPDATE" then
+        if pendingAlt then
+            if GetTime() - (pendingAt or 0) > 120 then
+                pendingAlt = nil                  -- never showed up; forget the request
+            else
+                local want = string.lower(pendingAlt)
+                local prefix, count = "raid", GetNumRaidMembers()
+                if count == 0 then prefix, count = "party", GetNumPartyMembers() end
+                for i = 1, count do
+                    local nm = UnitName(prefix .. i)
+                    if nm and string.lower(nm) == want then
+                        rememberAlt(nm)
+                        pendingAlt = nil
+                        refreshAltFlyout()
+                        say("remembered " .. GOLD .. nm .. R .. " as an alt.")
+                        break
+                    end
+                end
+            end
+        end
     elseif event == "PLAYER_TARGET_CHANGED" then
         if modFly and modFly:IsShown() then modFly.refresh() end
     elseif event == "UNIT_MAXHEALTH" then

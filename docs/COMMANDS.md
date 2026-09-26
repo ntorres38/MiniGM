@@ -86,8 +86,8 @@ Four buttons are `SecureActionButtonTemplate` macros rather than ordinary button
 |---|---|
 | Speed *n*× | `/target [noexists] player` + `/say .modify speed all <n>` |
 | Speed normal | `/target [noexists] player` + `/say .modify speed all 1` |
-| Full heal | `/target [noexists] player` + `/say .modify hp <max>` (+ `.modify mana <max>`) |
-| Revive all | `/tar player` + `/s .revive` + `/p revive` |
+| Full heal | `/target [noexists] player` + `/w <you> .modify hp <max>` (+ `.modify mana <max>`) — whispered to yourself so it works while dead |
+| Revive all | `/tar player` + `/w <you> .revive` + `/p revive` — whispered to yourself so it works while dead |
 
 `[noexists]` means *only target yourself if nothing is targeted* — with a bot selected, Speed and Full heal apply to the bot.
 
@@ -99,4 +99,4 @@ Because macro text cannot be changed during combat either, the Full heal and Spe
 
 ## Privacy
 
-Every GM command goes out in `/say`. On a public realm, anyone within earshot can read what you are doing. There is no whisper-to-self or hidden channel for GM commands in 3.3.5a; this is a property of how addons issue commands, not a MiniGM choice.
+While you are alive, every GM command goes out in `/say`, and on a public realm anyone within earshot can read what you are doing. While you are dead, the client refuses `/say` from a ghost, so MiniGM sends the command as a whisper to yourself instead; the server parses `.` commands out of a whisper exactly as it does out of `/say`. The Full heal and Revive all macros always whisper yourself, alive or dead, because their text is fixed when the button is built.

@@ -117,7 +117,7 @@ A secure macro:
 
 ```
 /tar player
-/s .revive
+/w <you> .revive
 /p revive
 ```
 
@@ -195,7 +195,7 @@ Lists every character you have logged into on this account. Clicking one sends `
 
 - The list builds itself: MiniGM records each character's name on login. You never type them.
 - **Right-click** a name to forget it.
-- **Type a name…** at the bottom opens a prompt for a name you have not logged into.
+- **Type a name…** at the bottom opens a prompt for a name you have not logged into — a character on a linked account, say, or the other faction. The moment that character joins your party it is added to the list for good. Random bots never come in this way, so they are never added; a typo never joins, so it is never added either. The pending name is dropped after two minutes if nobody shows up.
 - `/mgm addalt A,B,C` seeds the list by hand; `/mgm forgetalt <Name>` removes one.
 
 Altbots are your real characters — they keep XP, gold and loot earned while grouped with you.

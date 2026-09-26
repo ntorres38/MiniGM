@@ -7,7 +7,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/WoW-3.3.5a%20(WotLK)-A330C9" alt="WoW 3.3.5a">
   <img src="https://img.shields.io/badge/server-AzerothCore-1E8CBE" alt="AzerothCore">
-  <img src="https://img.shields.io/badge/version-1.0.0-F0A020" alt="1.0.0">
+  <img src="https://img.shields.io/badge/version-1.1.0-F0A020" alt="1.1.0">
   <img src="https://img.shields.io/badge/license-GPLv3-3DA639" alt="GPLv3">
   <img src="https://img.shields.io/badge/libraries-none-6E7781" alt="No libraries">
   <img src="https://img.shields.io/badge/built%20with-AI%20assistance-8A63D2" alt="Built with AI assistance">
@@ -158,7 +158,7 @@ Every button types a chat command. Clicking God ON puts `.cheat god on` into `/s
 That explains most of the questions people have:
 
 - **A button does nothing?** Your gmlevel is below that command. Type `.commands` to see what you're allowed.
-- **Everything goes out in `/say`.** Anyone standing near you can read it. That's just how addons issue commands in 3.3.5a.
+- **Commands go out in `/say` while you're alive.** Anyone standing near you can read them. While you're dead they go out as a whisper to yourself instead, because the client refuses `/say` from a ghost — the server reads `.` commands from a whisper the same way.
 - **MiniGM can't see what happened.** It sends and moves on. That's why Cheat status exists: it asks the server rather than guessing.
 
 Messages queue at one per 0.4 seconds, and each one is echoed to your chat frame in gold so you can see what went out.
@@ -194,7 +194,7 @@ You don't need to port-forward a private realm. Tailscale or WireGuard with a su
 
 ## Install
 
-1. Go to [Releases](https://github.com/ntorres38/MiniGM/releases) and download **`MiniGM-Addon-1.0.0.zip`**.
+1. Go to [Releases](https://github.com/ntorres38/MiniGM/releases) and download **`MiniGM-Addon-1.1.0.zip`**.
 2. Open it. There's one folder inside, called `MiniGM`.
 3. Drag that folder into `<World of Warcraft>\Interface\AddOns\`.
 4. Restart the client. `/reload` won't find a new addon.
@@ -202,7 +202,7 @@ You don't need to port-forward a private realm. Tailscale or WireGuard with a su
 
 > **Take the file with `Addon` in the name.** GitHub also puts a "Source code (zip)" on every release. That one is the whole repository and the folder inside it is named after the tag, which WoW won't load — the folder has to be named `MiniGM` to match the `.toc`. The `Addon` zip is already packaged correctly.
 
-You should see `MiniGM: v1.0.0 loaded`, and the Tele tab should say `loaded - 1306 locations in 143 zones`.
+You should see `MiniGM: v1.1.0 loaded`, and the Tele tab should say `loaded - 1306 locations in 143 zones`.
 
 More detail and troubleshooting in [docs/INSTALL.md](docs/INSTALL.md).
 

@@ -4,6 +4,14 @@ WoW 3.3.5a (Interface 30300), AzerothCore.
 
 ---
 
+## 1.1.0 — alts remembered on join
+
+- ADD A name typed into "Type a name..." is remembered as an alt the moment that character joins your party. Random bots arrive through `addclass` and never pass through that path, so they are never remembered; a typo never joins, so it is never remembered either. Works for characters on linked accounts and for the opposite faction (needs `AllowTwoSide.Interaction.Group = 1` on the server).
+- CHANGE The pending name expires after two minutes if nobody joins.
+- FIX Every button was dead while you were dead. The client refuses `/say` from a ghost, and every command went out on `/say`. Commands now go out as a whisper to yourself when you are dead (the server parses `.` commands from a whisper the same way); the Full heal and Revive all macros always whisper yourself, alive or dead.
+
+---
+
 ## 1.0.0 — first release
 
 Everything in 1.0.0-rc, plus the documentation and packaging work that came out of actually publishing it.
