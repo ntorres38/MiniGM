@@ -57,7 +57,7 @@ So I built a small HUD that plays alongside you and doesn't make you stop what y
 > **I'm a cybersecurity professional, not a developer.** I built this with [Claude](https://claude.ai). The design calls, the bug reports and every hour of in-game testing are mine, but I didn't hand-write the Lua. There's [more on what that meant](#how-this-was-built) at the bottom, including the two bugs that shipped and only got caught by playing the game.
 
 <p align="center">
-  <img src="docs/images/hud.png" alt="The MiniGM HUD tab" width="320">
+  <img src="docs/images/hud-panel-1.2.0.png" alt="The MiniGM HUD tab (1.2.0)" width="320">
 </p>
 
 ---
@@ -74,7 +74,8 @@ So I built a small HUD that plays alongside you and doesn't make you stop what y
 | | Full heal | An actual heal, not the max-HP hack you'll find in old macro guides |
 | | Revive target | The selected player or bot |
 | **Group** | Revive all | Revives you and tells the bots to revive. Different commands for each. |
-| | Maint / Gear | `maintenance` + `autogear` + `nc -loot`, spaced properly. If self-bot is on, it stops and makes you type your character name first (it would hit **you** too) |
+| | Maint | `maintenance` + `nc -loot` to the group's bots. Solo, it offers maintenance on **you** — behind the warning window below |
+| | Gear | `autogear` only, so you can gear a character without maintenance teaching it professions and spending its talents. Solo: autogear on **you**, behind the same window |
 | **Combat** | Kill target | `.die`, with guards so it won't hit you or a friendly |
 | | Cheat status | What the *server* thinks is on. Handy after a relog. |
 | **Character** | Modify Char | Set level and add gold on your target. Level only goes up. |
@@ -107,6 +108,12 @@ Three columns: continent, zone, location. All of them stay clickable, so the sta
 It scales instead of resizing because every button sits at a hardcoded pixel offset. Stretching the frame would leave them all huddled in the top-left corner looking broken.
 
 **It learns your alts.** You never type a character name. MiniGM notes every character you log into, and Add alt lists them back to you. Click to log one in as a bot, right-click to forget it. If you run ten alts as a standing bot party, this saves you remembering how you spelled *Parriahshamy* at 1am.
+
+**Anything that could change your own character** — Maint or Gear with self-bot on, Maint/Gear on yourself, Modify Char aimed at you — opens one confirm window that lists every permanent change and sends nothing until you type `Accept` (case sensitive). A wrong word keeps the window open with a red error; `autogear reset` and `bis` are never sent at all.
+
+<p align="center">
+  <img src="docs/images/warn-maintenance.png" alt="The self-bot warning window listing every change maintenance makes" width="420">
+</p>
 
 <p align="center">
   <img src="docs/images/altlist.png" alt="The Add alt flyout, listing remembered characters" width="320">
