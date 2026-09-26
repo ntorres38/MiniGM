@@ -26,7 +26,7 @@
 ----------------------------------------------------------------------]]
 
 local ADDON   = "MiniGM"
-local VERSION = "1.1.0"
+local VERSION = "1.2.0"
 local FRAME_H = 378
 
 local GOLD  = "|cffffd100"
@@ -68,6 +68,14 @@ sender:SetScript("OnUpdate", function(self, delta)
 end)
 
 local function queueSend(text, channel, to)
+    -- HARD BLOCK: "autogear reset" and the BiS fallback destroy every equipped
+    -- item before regearing (TrainerAction.cpp). MiniGM never sends them.
+    local low = string.lower(text or "")
+    if string.find(low, "^%s*autogear%s+reset") or string.find(low, "^%s*bis") then
+        DEFAULT_CHAT_FRAME:AddMessage("|cffff2020MiniGM: refused '" .. text ..
+            "' - it destroys all equipped gear.|r")
+        return
+    end
     -- always queue: two cmd() calls in the same click must not race each other
     if table.getn(sendQueue) == 0 then
         sender.elapsed = 0.4    -- first message goes out on the next frame
@@ -108,6 +116,98 @@ end
 
 local function trim(s)
     return (string.gsub(string.gsub(s or "", "^%s+", ""), "%s+$", ""))
+end
+
+----------------------------------------------------------------------
+-- SELF-BOT GUARD (1.2.0)
+-- ".playerbots bot self" gives YOUR character bot AI. While it is on, your
+-- own character obeys "maintenance"/"autogear" said in party/raid chat, the
+-- same as a bot. The server announces the toggle with the exact system lines
+-- "Enable player botAI" / "Disable player botAI" (PlayerbotMgr.cpp).
+-- State is kept per character in MiniGMDB.selfBot and survives /reload.
+-- Fail-safe: if MiniGM last saw it ON, it stays ON until the server says
+-- "Disable player botAI" (or /mgm selfbot off). Worst case = an extra popup.
+----------------------------------------------------------------------
+local function selfBotOn()
+    MiniGMDB.selfBot = MiniGMDB.selfBot or {}
+    return MiniGMDB.selfBot[UnitName("player") or ""] and true or false
+end
+
+local function setSelfBot(on)
+    MiniGMDB.selfBot = MiniGMDB.selfBot or {}
+    MiniGMDB.selfBot[UnitName("player") or ""] = on and true or nil
+end
+
+-- What each command does to the character that receives it.
+-- Source: mod-playerbots MaintenanceAction::Execute / PlayerbotFactory,
+-- AutoGearAction::Execute (TrainerAction.cpp). Keep in step with the server.
+local SELFBOT_WARNING =
+    "|cffff2020STOP - self-bot is ON.|r\n" ..
+    "This targets YOUR character: |cffffd100%s|r\n\n" ..
+    "MAINTENANCE will, permanently:\n" ..
+    "- Learn weapon skills and set them to max\n  (Swords, Daggers, Maces, Staves, etc. for your class)\n" ..
+    "- Learn professions / secondary skills\n  (First Aid, Fishing, Cooking, gathering/crafting)\n" ..
+    "- Learn every class spell available at your level\n" ..
+    "- Learn all other available spells + special spells\n" ..
+    "- Spend ALL talent points (picks its own spec)\n" ..
+    "- Insert glyphs\n" ..
+    "- Enchant and gem your equipped gear (level-gated)\n" ..
+    "- Learn riding skill + mounts\n" ..
+    "- Set dungeon-key reputations to Honored (level 70+)\n" ..
+    "- Complete attunement quests\n" ..
+    "- Fill bags: bags, ammo, food, drink, reagents,\n  consumables, potions, keyring\n" ..
+    "- Create/train a pet + pet talents (hunter/warlock)\n" ..
+    "- Repair all gear\n\n" ..
+    "AUTOGEAR will:\n" ..
+    "- Replace equipped items with generated Rare-or-lower gear\n  (old items go to bags; if bags are full, that slot is skipped)\n\n" ..
+    "None of this can be undone in game.\n" ..
+    "Type |cffffd100%s|r to continue:"
+
+local pendingSelfBotAction = nil
+
+local function selfBotAnswer(typed)
+    local me = UnitName("player") or ""
+    if string.lower(trim(typed)) == string.lower(me) and me ~= "" then
+        if pendingSelfBotAction then pendingSelfBotAction() end
+    else
+        say(RED .. "Cancelled - nothing was sent. You must type " .. me .. R)
+    end
+    pendingSelfBotAction = nil
+end
+
+StaticPopupDialogs["MINIGM_SELFBOT_WARN"] = {
+    text = SELFBOT_WARNING,
+    button1 = "Send", button2 = "Cancel",
+    hasEditBox = 1, timeout = 0, whileDead = 1, hideOnEscape = 1,
+    showAlert = 1,
+    OnShow = function(self)
+        local eb = _G[self:GetName() .. "EditBox"]
+        if eb then eb:SetText("") eb:SetFocus() end
+    end,
+    OnAccept = function(self)
+        local eb = _G[self:GetName() .. "EditBox"]
+        selfBotAnswer(eb and eb:GetText() or "")
+    end,
+    OnCancel = function()
+        if pendingSelfBotAction then
+            say("Cancelled - nothing was sent.")
+        end
+        pendingSelfBotAction = nil
+    end,
+    EditBoxOnEnterPressed = function(self)
+        local typed = self:GetText() or ""
+        self:GetParent():Hide()
+        selfBotAnswer(typed)
+    end,
+    EditBoxOnEscapePressed = function(self) self:GetParent():Hide() end,
+}
+
+-- run fn now, or - if self-bot is on - only after the name is typed
+local function guardSelfBot(fn)
+    if not selfBotOn() then fn() return end
+    pendingSelfBotAction = fn
+    local me = UnitName("player") or "?"
+    StaticPopup_Show("MINIGM_SELFBOT_WARN", me, me)
 end
 
 local function playerTargetName()
@@ -450,11 +550,13 @@ button("Maint / Gear", function()
         return
     end
     local channel = inRaid and "RAID" or "PARTY"
-    for _, line in ipairs({ "maintenance", "autogear", "nc -loot" }) do
-        table.insert(sendQueue, { text = line, channel = channel })
-    end
-    sender.elapsed = 0.4   -- first one goes out on the next frame
-end, "maintenance + autogear + nc -loot to party/raid.\nautogear never sends 'reset', so worn gear is kept.")
+    guardSelfBot(function()
+        for _, line in ipairs({ "maintenance", "autogear", "nc -loot" }) do
+            table.insert(sendQueue, { text = line, channel = channel })
+        end
+        sender.elapsed = 0.4   -- first one goes out on the next frame
+    end)
+end, "maintenance + autogear + nc -loot to party/raid.\nautogear never sends 'reset', so worn gear is kept.\nIf self-bot is ON this also hits YOU - MiniGM stops and\nmakes you type your character name first.")
 
 ----------------------------------------------------------------------
 -- COMBAT
@@ -1558,7 +1660,23 @@ ev:RegisterEvent("PLAYER_TARGET_CHANGED")
 ev:RegisterEvent("PLAYER_ENTERING_WORLD")
 ev:RegisterEvent("PARTY_MEMBERS_CHANGED")
 ev:RegisterEvent("RAID_ROSTER_UPDATE")
+ev:RegisterEvent("CHAT_MSG_SYSTEM")
 ev:SetScript("OnEvent", function(self, event, unit)
+    if event == "CHAT_MSG_SYSTEM" then
+        local msg = unit or ""
+        if string.find(msg, "Enable player botAI", 1, true) then
+            setSelfBot(true)
+            say(RED .. "Self-bot is ON for " .. (UnitName("player") or "?") ..
+                " - Maint/Gear will ask for your name first." .. R)
+        elseif string.find(msg, "Disable player botAI", 1, true)
+            or string.find(msg, "Self-bot is disabled", 1, true)
+            or string.find(msg, "do not have permission to enable player botAI", 1, true) then
+            if selfBotOn() then say("Self-bot is off.") end
+            setSelfBot(false)
+        end
+        return
+    end
+
     if event == "PLAYER_ENTERING_WORLD" then
         flyActive = false            -- zoning/relog clears GM fly server-side
         return
@@ -1616,6 +1734,18 @@ SLASH_MINIGM2 = "/minigm"
 SlashCmdList["MINIGM"] = function(msg)
     msg = trim(msg or "")
     local lower = string.lower(msg)
+
+    if lower == "selfbot" then
+        say("self-bot for " .. (UnitName("player") or "?") .. ": " ..
+            (selfBotOn() and (RED .. "ON (Maint/Gear will ask for your name)" .. R) or "off"))
+        return
+    end
+    if lower == "selfbot off" then
+        setSelfBot(false)
+        say("self-bot flag cleared for " .. (UnitName("player") or "?") ..
+            ". This only resets MiniGM's memory - it does not change the server.")
+        return
+    end
 
     local run = string.match(lower, "^runspeed%s+([%d%.]+)$")
     if run then
@@ -1755,6 +1885,7 @@ SlashCmdList["MINIGM"] = function(msg)
         say("/mgm flyspeed <0.1-50>  - current " .. (MiniGMDB.flySpeed or 4.65) ..
             "  (2.8 epic, 3.1 fastest, 4.65 = 1.5x fastest)")
         say("/mgm flymount <displayID>  - current " .. (MiniGMDB.flyMount or 28652))
+        say("/mgm selfbot  - is self-bot on for this character?  |  /mgm selfbot off  - clear MiniGM's flag")
         return
     end
 

@@ -135,6 +135,8 @@ nc -loot
 
 Refuses if you are not grouped, since nothing would hear it.
 
+> **Self-bot guard (1.2.0).** If you have turned on self-bot (`.playerbots bot self`), *your own* character obeys these commands too — `maintenance` would teach you weapon skills, professions, First Aid, Fishing, Cooking, spend your talents, enchant your gear and fill your bags, permanently. MiniGM watches for the server's `Enable player botAI` line; while self-bot is on, Maint/Gear opens a warning listing every change and sends **nothing** until you type your character name. It clears when the server says `Disable player botAI`. The flag is per character and survives `/reload`; if MiniGM ever thinks it is on when it isn't, `/mgm selfbot off` clears it.
+
 > **`autogear` never sends `reset`.** Plain `autogear` swaps a slot only when the new item scores ≥ 1.2× the old one, and the replaced item is stored to the bot's bags — nothing is destroyed. `autogear reset` calls `DestroyEquippedGear` and **destroys all worn gear**. MiniGM never sends it. Free up bag slots on the bot first, or slots get skipped.
 
 ---

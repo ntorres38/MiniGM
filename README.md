@@ -7,7 +7,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/WoW-3.3.5a%20(WotLK)-A330C9" alt="WoW 3.3.5a">
   <img src="https://img.shields.io/badge/server-AzerothCore-1E8CBE" alt="AzerothCore">
-  <img src="https://img.shields.io/badge/version-1.1.0-F0A020" alt="1.1.0">
+  <img src="https://img.shields.io/badge/version-1.2.0-F0A020" alt="1.2.0">
   <img src="https://img.shields.io/badge/license-GPLv3-3DA639" alt="GPLv3">
   <img src="https://img.shields.io/badge/libraries-none-6E7781" alt="No libraries">
   <img src="https://img.shields.io/badge/built%20with-AI%20assistance-8A63D2" alt="Built with AI assistance">
@@ -74,7 +74,7 @@ So I built a small HUD that plays alongside you and doesn't make you stop what y
 | | Full heal | An actual heal, not the max-HP hack you'll find in old macro guides |
 | | Revive target | The selected player or bot |
 | **Group** | Revive all | Revives you and tells the bots to revive. Different commands for each. |
-| | Maint / Gear | `maintenance` + `autogear` + `nc -loot`, spaced properly |
+| | Maint / Gear | `maintenance` + `autogear` + `nc -loot`, spaced properly. If self-bot is on, it stops and makes you type your character name first (it would hit **you** too) |
 | **Combat** | Kill target | `.die`, with guards so it won't hit you or a friendly |
 | | Cheat status | What the *server* thinks is on. Handy after a relog. |
 | **Character** | Modify Char | Set level and add gold on your target. Level only goes up. |
@@ -194,7 +194,7 @@ You don't need to port-forward a private realm. Tailscale or WireGuard with a su
 
 ## Install
 
-1. Go to [Releases](https://github.com/ntorres38/MiniGM/releases) and download **`MiniGM-Addon-1.1.0.zip`**.
+1. Go to [Releases](https://github.com/ntorres38/MiniGM/releases) and download **`MiniGM-Addon-1.2.0.zip`**.
 2. Open it. There's one folder inside, called `MiniGM`.
 3. Drag that folder into `<World of Warcraft>\Interface\AddOns\`.
 4. Restart the client. `/reload` won't find a new addon.
@@ -202,9 +202,9 @@ You don't need to port-forward a private realm. Tailscale or WireGuard with a su
 
 > **Take the file with `Addon` in the name.** GitHub also puts a "Source code (zip)" on every release. That one is the whole repository and the folder inside it is named after the tag, which WoW won't load — the folder has to be named `MiniGM` to match the `.toc`. The `Addon` zip is already packaged correctly.
 
-You should see `MiniGM: v1.1.0 loaded`, and the Tele tab should say `loaded - 1306 locations in 143 zones`.
+You should see `MiniGM: v1.2.0 loaded`, and the Tele tab should say `loaded - 1306 locations in 143 zones`.
 
-More detail and troubleshooting in [docs/INSTALL.md](docs/INSTALL.md).
+More detail and troubleshooting in [docs/INSTALL.md](docs/INSTALL.md). What changed in each version: [CHANGELOG.md](CHANGELOG.md).
 
 ---
 

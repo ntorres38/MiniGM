@@ -70,9 +70,11 @@ These are not GM commands. They are plain chat that mod-playerbots interprets, s
 | `summon` | PARTY / RAID | Tele → Party / Raid | every bot in the group teleports to you |
 | `summon` | WHISPER | Tele → Target | that one bot teleports to you |
 | `revive` | PARTY | Revive all (macro) | group's bots revive |
-| `maintenance` | PARTY / RAID | Maint / Gear | bots repair, refill reagents, re-buff |
-| `autogear` | PARTY / RAID | Maint / Gear | bots upgrade gear from bags; nothing destroyed |
+| `maintenance` | PARTY / RAID | Maint / Gear | **permanent:** learns weapon skills (set to max), professions/secondary skills, all class + available + special spells, spends all talent points, glyphs, enchants + gems, riding + mounts, dungeon-key reps (70+), attunement quests, pet + pet talents; fills bags/ammo/food/reagents/consumables/potions/keyring; repairs. Source: `MaintenanceAction::Execute` |
+| `autogear` | PARTY / RAID | Maint / Gear | equips **generated** gear up to `AutoGearQualityLimit` (Rare by default) where it scores ≥ 1.2× the worn item; old item goes to bags, full bags skip the slot. Nothing destroyed. `autogear reset` and `bis` are blocked — they destroy worn gear |
 | `nc -loot` | PARTY / RAID | Maint / Gear | disables the bots' non-combat looting strategy |
+
+**Self-bot:** `.playerbots bot self` gives *your* character bot AI, and then it obeys `maintenance`/`autogear` in party chat like any bot. MiniGM watches for the server lines `Enable player botAI` / `Disable player botAI`; while self-bot is on, Maint/Gear shows the full list above and sends nothing until you type your character name. `/mgm selfbot` shows the state, `/mgm selfbot off` clears MiniGM's flag. A command you type into chat yourself is not covered — the server setting `AiPlayerbot.SelfBotLevel = 0` blocks self-bot entirely.
 
 **Bots ignore `.summon`; humans ignore chat `summon`.** That asymmetry is why Target sends both forms and why Party/Raid cannot move a human group member.
 

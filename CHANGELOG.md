@@ -4,6 +4,16 @@ WoW 3.3.5a (Interface 30300), AzerothCore.
 
 ---
 
+## 1.2.0 — self-bot guard
+
+- ADD **Self-bot guard on Maint / Gear.** With `.playerbots bot self` on, your own character obeys `maintenance` and `autogear` said in party chat, exactly like a bot. `maintenance` permanently learns weapon skills, professions and secondary skills (First Aid, Fishing, Cooking), every available spell, spends all talent points, adds glyphs, enchants and gems gear, and fills your bags. MiniGM now watches for the server's `Enable player botAI` / `Disable player botAI` lines, and while self-bot is on the button opens a warning that lists every change and sends nothing until you type your character name. The list was checked line by line against `MaintenanceAction::Execute` on mod-playerbots `b6696bd`.
+- ADD `/mgm selfbot` (show the state) and `/mgm selfbot off` (clear MiniGM's flag if it is stale).
+- ADD Hard block: MiniGM refuses to send `autogear reset` or `bis`. Both destroy every equipped item before regearing.
+- FIX docs/COMMANDS.md described `maintenance` as "repair, refill reagents, re-buff" and `autogear` as "upgrade gear from bags". Both were wrong. Rewritten from the source.
+- ADD CHANGELOG link in the README Install section.
+
+---
+
 ## 1.1.0 — alts remembered on join
 
 - ADD A name typed into "Type a name..." is remembered as an alt the moment that character joins your party. Random bots arrive through `addclass` and never pass through that path, so they are never remembered; a typo never joins, so it is never remembered either. Works for characters on linked accounts and for the opposite faction (needs `AllowTwoSide.Interaction.Group = 1` on the server).

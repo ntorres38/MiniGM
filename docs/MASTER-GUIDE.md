@@ -7,7 +7,7 @@ This document is written to be given to a large language model. Upload it to Cla
 It is also perfectly readable by a human. Nothing here assumes you write Lua.
 
 - **Addon:** MiniGM by Parriah
-- **Version:** 1.1.0
+- **Version:** 1.2.0
 - **Target:** World of Warcraft 3.3.5a (WotLK, build 12340), Interface 30300
 - **Server:** AzerothCore
 - **Licence:** GPLv3
@@ -131,7 +131,7 @@ Copy-Item -Force "$src\Tele\TeleportDB.lua" "$dst\Tele"
 
 **Restart the client fully.** A new addon is not found by `/reload`. At character select, check **AddOns** and confirm MiniGM is listed and ticked.
 
-**Verify.** On login you should see `MiniGM: v1.1.0 loaded. /mgm to show/hide.` Type `/mgm`, click **Tele**, and it should report `loaded - 1306 locations in 143 zones`. If it says `FAILED: Tele\TeleportDB.lua did not load` in red, the subfolder did not copy.
+**Verify.** On login you should see `MiniGM: v1.2.0 loaded. /mgm to show/hide.` Type `/mgm`, click **Tele**, and it should report `loaded - 1306 locations in 143 zones`. If it says `FAILED: Tele\TeleportDB.lua did not load` in red, the subfolder did not copy.
 
 **Updating.** A `.lua`-only change needs `/reload`. A `.toc` change, or adding/removing a file, needs a full client restart. Settings live in `WTF\Account\<ACCOUNT>\SavedVariables\MiniGM.lua` and survive updates.
 
