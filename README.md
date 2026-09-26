@@ -201,7 +201,7 @@ You don't need to port-forward a private realm. Tailscale or WireGuard with a su
 
 ## Install
 
-1. Go to [Releases](https://github.com/ntorres38/MiniGM/releases) and download **`MiniGM-Addon-1.2.0.zip`**.
+1. Go to the **[latest release](https://github.com/ntorres38/MiniGM/releases/latest)** and download **`MiniGM-Addon-<version>.zip`**.
 2. Open it. There's one folder inside, called `MiniGM`.
 3. Drag that folder into `<World of Warcraft>\Interface\AddOns\`.
 4. Restart the client. `/reload` won't find a new addon.
@@ -209,7 +209,7 @@ You don't need to port-forward a private realm. Tailscale or WireGuard with a su
 
 > **Take the file with `Addon` in the name.** GitHub also puts a "Source code (zip)" on every release. That one is the whole repository and the folder inside it is named after the tag, which WoW won't load — the folder has to be named `MiniGM` to match the `.toc`. The `Addon` zip is already packaged correctly.
 
-You should see `MiniGM: v1.2.0 loaded`, and the Tele tab should say `loaded - 1306 locations in 143 zones`.
+You should see `MiniGM: v<version> loaded`, and the Tele tab should say `loaded - 1306 locations in 143 zones`.
 
 More detail and troubleshooting in [docs/INSTALL.md](docs/INSTALL.md). What changed in each version: [CHANGELOG.md](CHANGELOG.md).
 
