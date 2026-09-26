@@ -27,7 +27,7 @@
 
 local ADDON   = "MiniGM"
 local VERSION = "1.2.0"
-local FRAME_H = 378
+local FRAME_H = 403   -- +25 in 1.2.0: Maint and Gear are separate buttons
 
 local GOLD  = "|cffffd100"
 local GREEN = "|cff40ff40"
@@ -55,14 +55,38 @@ end
 -- (seen Sep 20: maintenance/autogear/nc -loot -> only 2 of 3 arrived).
 -- Everything outgoing goes through this queue: one message per 0.4s.
 local sendQueue = {}
+-- self-bot reply tracking: the bot AI answers a command it actually ran with a
+-- whisper from YOU ("I'm maintaining", "I'm auto gearing (...)", or an error)
+local selfReply = { want = nil, got = false }
 local sender = CreateFrame("Frame")
 sender.elapsed = 0
 sender:SetScript("OnUpdate", function(self, delta)
     if table.getn(sendQueue) == 0 then return end
     self.elapsed = self.elapsed + (delta or 0)
+    local head = sendQueue[1]
+    if head.wait then                         -- pause item: hold the queue
+        if self.elapsed < head.wait then return end
+        table.remove(sendQueue, 1)
+        self.elapsed = 0.4                    -- next item goes straight out
+        return
+    end
+    if head.waitReply then                    -- hold until the bot AI answers
+        if selfReply.got then
+            table.remove(sendQueue, 1)
+            self.elapsed = 0.4
+            return
+        end
+        if self.elapsed < head.waitReply then return end
+        table.remove(sendQueue, 1)            -- timed out: carry on (turns self-bot off)
+        DEFAULT_CHAT_FRAME:AddMessage("|cffff2020MiniGM: no answer from the bot AI in " ..
+            head.waitReply .. " s - the command may not have run.|r")
+        self.elapsed = 0.4
+        return
+    end
     if self.elapsed < 0.4 then return end
     self.elapsed = 0
     local item = table.remove(sendQueue, 1)
+    if item.fn then item.fn() return end      -- deferred check/action
     SendChatMessage(item.text, item.channel, nil, item.to)
     say(GOLD .. item.text .. R)
 end)
@@ -141,74 +165,235 @@ end
 -- What each command does to the character that receives it.
 -- Source: mod-playerbots MaintenanceAction::Execute / PlayerbotFactory,
 -- AutoGearAction::Execute (TrainerAction.cpp). Keep in step with the server.
-local SELFBOT_WARNING =
-    "|cffff2020STOP - self-bot is ON.|r\n" ..
-    "This targets YOUR character: |cffffd100%s|r\n\n" ..
-    "MAINTENANCE will, permanently:\n" ..
-    "- Learn weapon skills and set them to max\n  (Swords, Daggers, Maces, Staves, etc. for your class)\n" ..
-    "- Learn professions / secondary skills\n  (First Aid, Fishing, Cooking, gathering/crafting)\n" ..
-    "- Learn every class spell available at your level\n" ..
-    "- Learn all other available spells + special spells\n" ..
-    "- Spend ALL talent points (picks its own spec)\n" ..
-    "- Insert glyphs\n" ..
-    "- Enchant and gem your equipped gear (level-gated)\n" ..
-    "- Learn riding skill + mounts\n" ..
-    "- Set dungeon-key reputations to Honored (level 70+)\n" ..
-    "- Complete attunement quests\n" ..
-    "- Fill bags: bags, ammo, food, drink, reagents,\n  consumables, potions, keyring\n" ..
-    "- Create/train a pet + pet talents (hunter/warlock)\n" ..
-    "- Repair all gear\n\n" ..
-    "AUTOGEAR will:\n" ..
-    "- Replace equipped items with generated Rare-or-lower gear\n  (old items go to bags; if bags are full, that slot is skipped)\n\n" ..
-    "None of this can be undone in game.\n" ..
-    "Type |cffffd100%s|r to continue:"
+-- One item per line, left-aligned, short enough never to wrap at 400px.
+local MAINT_LINES = {
+    "|cffffd100MAINTENANCE  (permanent)|r",
+    "   -  Weapon skills learned and raised to max",
+    "   -  Professions: First Aid, Fishing, Cooking, gathering",
+    "   -  Every class spell available at your level",
+    "   -  All other available spells + special spells",
+    "   -  ALL talent points spent (it picks the spec)",
+    "   -  Glyphs inserted",
+    "   -  Equipped gear enchanted and gemmed",
+    "   -  Riding skill and mounts learned",
+    "   -  Dungeon-key reputations set to Honored (70+)",
+    "   -  Attunement quests completed",
+    "   -  Bags filled: food, drink, ammo, reagents, potions",
+    "   -  Pet created + pet talents (hunter / warlock)",
+    "   -  All gear repaired",
+}
+local GEAR_LINES = {
+    "|cffffd100AUTOGEAR|r",
+    "   -  Equipped items replaced with Rare-or-lower gear",
+    "   -  Old items go to your bags (full bags: slot skipped)",
+}
 
 local pendingSelfBotAction = nil
 
+-- Custom window instead of a StaticPopup: StaticPopup is fixed at 320px,
+-- centre-aligns and wraps every line, and its translucent background lets
+-- nameplates show through. This one is 480px, opaque, left-aligned,
+-- FULLSCREEN_DIALOG strata, movable, Esc closes it.
+local warn = CreateFrame("Frame", "MiniGMSelfWarn", UIParent)
+warn:SetFrameStrata("FULLSCREEN_DIALOG")
+warn:SetToplevel(true)
+warn:SetWidth(480)
+warn:SetPoint("CENTER", UIParent, "CENTER", 0, 80)
+warn:SetBackdrop({
+    bgFile   = "Interface\\DialogFrame\\UI-DialogBox-Background-Dark",
+    edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+    tile = true, tileSize = 32, edgeSize = 32,
+    insets = { left = 11, right = 12, top = 12, bottom = 11 },
+})
+local warnShade = warn:CreateTexture(nil, "BACKGROUND")
+warnShade:SetTexture(0, 0, 0, 0.9)               -- opaque: nothing bleeds through
+warnShade:SetPoint("TOPLEFT", 11, -12)
+warnShade:SetPoint("BOTTOMRIGHT", -12, 11)
+warn:EnableMouse(true)
+warn:SetMovable(true)
+warn:RegisterForDrag("LeftButton")
+warn:SetScript("OnDragStart", function(self) self:StartMoving() end)
+warn:SetScript("OnDragStop",  function(self)
+    self:StopMovingOrSizing()
+    local point, _, rel, x, y = self:GetPoint()
+    MiniGMDB.warnPos = { point = point, rel = rel, x = x, y = y }
+end)
+warn:Hide()
+table.insert(UISpecialFrames, "MiniGMSelfWarn")  -- Esc closes it
+
+local warnIcon = warn:CreateTexture(nil, "ARTWORK")
+warnIcon:SetTexture("Interface\\DialogFrame\\UI-Dialog-Icon-AlertNew")
+warnIcon:SetWidth(40) warnIcon:SetHeight(40)
+warnIcon:SetPoint("TOPLEFT", warn, "TOPLEFT", 24, -22)
+
+local warnTitle = warn:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+warnTitle:SetPoint("TOPLEFT", warnIcon, "TOPRIGHT", 12, -2)
+warnTitle:SetJustifyH("LEFT")
+
+local warnWho = warn:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+warnWho:SetPoint("TOPLEFT", warnTitle, "BOTTOMLEFT", 0, -6)
+warnWho:SetJustifyH("LEFT")
+
+local warnBody = warn:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+warnBody:SetPoint("TOPLEFT", warn, "TOPLEFT", 32, -80)
+warnBody:SetWidth(416)
+warnBody:SetJustifyH("LEFT")
+warnBody:SetJustifyV("TOP")
+warnBody:SetSpacing(3)
+
+local warnFoot = warn:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+warnFoot:SetPoint("TOP", warnBody, "BOTTOM", 0, -16)
+warnFoot:SetText("|cffff2020None of this can be undone in game.|r\n\n" ..
+    "Type  |cffffd100Accept|r  (case sensitive) to continue:")
+warnFoot:SetSpacing(3)
+
+local warnHint = warn:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+warnHint:SetPoint("TOP", warnFoot, "BOTTOM", 0, -8)
+warnHint:SetText(" ")
+
+local warnBox = CreateFrame("EditBox", "MiniGMSelfWarnBox", warn, "InputBoxTemplate")
+warnBox:SetWidth(160) warnBox:SetHeight(20)
+warnBox:SetPoint("TOP", warnHint, "BOTTOM", 0, -6)
+warnBox:SetAutoFocus(false)
+warnBox:SetMaxLetters(12)
+
+local warnSend = CreateFrame("Button", nil, warn, "UIPanelButtonTemplate")
+warnSend:SetWidth(110) warnSend:SetHeight(22)
+warnSend:SetText("Send")
+warnSend:SetPoint("TOPRIGHT", warnBox, "BOTTOM", -8, -12)
+
+local warnCancel = CreateFrame("Button", nil, warn, "UIPanelButtonTemplate")
+warnCancel:SetWidth(110) warnCancel:SetHeight(22)
+warnCancel:SetText("Cancel")
+warnCancel:SetPoint("TOPLEFT", warnBox, "BOTTOM", 8, -12)
+
 local function selfBotAnswer(typed)
-    local me = UnitName("player") or ""
-    if string.lower(trim(typed)) == string.lower(me) and me ~= "" then
-        if pendingSelfBotAction then pendingSelfBotAction() end
-    else
-        say(RED .. "Cancelled - nothing was sent. You must type " .. me .. R)
+    if trim(typed) ~= "Accept" then
+        -- WRONG word: stay open and say so IN the window - a chat line is
+        -- invisible while a dialog has your attention (seen Sep 26).
+        warnHint:SetText(RED .. "That was not  Accept  - nothing sent. Try again, or Cancel." .. R)
+        warnBox:SetText("")
+        warnBox:SetFocus()
+        return
     end
+    local fn = pendingSelfBotAction
+    pendingSelfBotAction = nil                  -- so OnHide doesn't say "cancelled"
+    warn:Hide()
+    if fn then fn() end
+end
+
+warn:SetScript("OnHide", function()
+    if pendingSelfBotAction then say("Cancelled - nothing was sent.") end
     pendingSelfBotAction = nil
+    warnBox:ClearFocus()
+end)
+warnSend:SetScript("OnClick", function() selfBotAnswer(warnBox:GetText() or "") end)
+warnCancel:SetScript("OnClick", function() warn:Hide() end)
+warnBox:SetScript("OnEnterPressed",  function(self) selfBotAnswer(self:GetText() or "") end)
+warnBox:SetScript("OnEscapePressed", function() warn:Hide() end)
+
+-- Enter must work whether or not the box has focus (seen Sep 26: Enter did
+-- nothing, only a click on Send worked). The window itself takes the keyboard
+-- while it is open, the same way Blizzard's StaticPopup_OnKeyDown does:
+-- ENTER / NUMPADENTER = Send, ESCAPE = Cancel, any other key = focus the box.
+-- (It is a modal warning, so blocking movement keys while it is up is intended.)
+warn:EnableKeyboard(true)
+warn:SetScript("OnKeyDown", function(self, key)
+    if key == "ENTER" or key == "NUMPADENTER" then
+        selfBotAnswer(warnBox:GetText() or "")
+    elseif key == "ESCAPE" then
+        warn:Hide()
+    else
+        warnBox:SetFocus()
+    end
+end)
+
+-- size the window to its text every time (string height is only real once shown)
+local function layoutWarn()
+    local h = 80 + warnBody:GetStringHeight() + 16 + warnFoot:GetStringHeight()
+              + 8 + warnHint:GetStringHeight() + 6 + 20 + 12 + 22 + 24
+    warn:SetHeight(h)
 end
 
-StaticPopupDialogs["MINIGM_SELFBOT_WARN"] = {
-    text = SELFBOT_WARNING,
-    button1 = "Send", button2 = "Cancel",
-    hasEditBox = 1, timeout = 0, whileDead = 1, hideOnEscape = 1,
-    showAlert = 1,
-    OnShow = function(self)
-        local eb = _G[self:GetName() .. "EditBox"]
-        if eb then eb:SetText("") eb:SetFocus() end
-    end,
-    OnAccept = function(self)
-        local eb = _G[self:GetName() .. "EditBox"]
-        selfBotAnswer(eb and eb:GetText() or "")
-    end,
-    OnCancel = function()
-        if pendingSelfBotAction then
-            say("Cancelled - nothing was sent.")
-        end
-        pendingSelfBotAction = nil
-    end,
-    EditBoxOnEnterPressed = function(self)
-        local typed = self:GetText() or ""
-        self:GetParent():Hide()
-        selfBotAnswer(typed)
-    end,
-    EditBoxOnEscapePressed = function(self) self:GetParent():Hide() end,
-}
-
--- run fn now, or - if self-bot is on - only after the name is typed
-local function guardSelfBot(fn)
-    if not selfBotOn() then fn() return end
+-- THE one confirm window: every self-change in MiniGM goes through here,
+-- always with the same word (Accept), never a StaticPopup.
+local function showConfirmWindow(header, bodyLines, fn)
     pendingSelfBotAction = fn
-    local me = UnitName("player") or "?"
-    StaticPopup_Show("MINIGM_SELFBOT_WARN", me, me)
+    warnBody:SetText(table.concat(bodyLines, "\n"))
+    warnHint:SetText(" ")
+    warnTitle:SetText("|cffff2020STOP - " .. header .. "|r")
+    warnWho:SetText("This targets YOUR character:  |cffffd100" ..
+        (UnitName("player") or "?") .. "|r")
+    warnBox:SetText("")
+    warn:SetScale(MiniGMDB.warnScale or 1)
+    if MiniGMDB.warnPos then
+        local p = MiniGMDB.warnPos
+        warn:ClearAllPoints()
+        warn:SetPoint(p.point, UIParent, p.rel, p.x, p.y)
+    end
+    warn:Show()
+    layoutWarn()
+    warnBox:SetFocus()
 end
+
+local function selfWarnLines(which)
+    local lines = {}
+    if which ~= "gear" then for _, l in ipairs(MAINT_LINES) do table.insert(lines, l) end end
+    if which == "both" then table.insert(lines, " ") end
+    if which ~= "maint" then for _, l in ipairs(GEAR_LINES) do table.insert(lines, l) end end
+    return lines
+end
+
+local function showSelfWarning(header, fn, which)
+    showConfirmWindow(header, selfWarnLines(which), fn)
+end
+
+local function guardSelfBot(fn, which)
+    if not selfBotOn() then fn() return end
+    showSelfWarning("self-bot is ON.", fn, which)
+end
+
+-- Maintenance or Autogear ON YOURSELF (1.2.0) - separate, never both at once.
+-- Only after Accept is typed: self-bot on (if it was off) -> check the server
+-- confirmed it -> whisper yourself the ONE command -> wait 5 s so the bot AI
+-- answers (its own whisper, up to 30 s) -> self-bot off (only if MiniGM
+-- turned it on and it is still on).
+-- "autogear reset" / "bis" are hard-blocked in queueSend.
+local function selfRun(command, which, header)
+    local me = UnitName("player")
+    if not me or me == "" or me == "Unknown" then return end
+    showSelfWarning(header, function()
+        local weTurnedItOn = not selfBotOn()
+        if weTurnedItOn then cmd(".playerbots bot self") end
+        table.insert(sendQueue, { wait = 2 })
+        table.insert(sendQueue, { fn = function()
+            if not selfBotOn() then
+                -- server refused (no permission / SelfBotLevel 0): stop here
+                for i = table.getn(sendQueue), 1, -1 do table.remove(sendQueue, i) end
+                say(RED .. "Self-bot did not turn on - nothing else was sent." .. R)
+            end
+        end })
+        table.insert(sendQueue, { fn = function()
+            selfReply.want, selfReply.got = command, false
+        end })
+        queueSend(command, "WHISPER", me)
+        -- Fixed 5 s was not enough: self-bot's AI acts on its next update
+        -- cycle, and turning it off first deleted the AI before autogear ran
+        -- (seen Sep 26: command received, no "I'm auto gearing", nothing
+        -- changed). Wait for its own reply, up to 30 s, then 1 s margin.
+        table.insert(sendQueue, { waitReply = 30 })
+        table.insert(sendQueue, { wait = 1 })
+        table.insert(sendQueue, { fn = function() selfReply.want = nil end })
+        if weTurnedItOn then
+            table.insert(sendQueue, { fn = function()
+                if selfBotOn() then cmd(".playerbots bot self") end
+            end })
+        end
+    end, which)
+end
+
+local function maintMe() selfRun("maintenance", "maint", "Maintenance on YOURSELF.") end
+local function gearMe()  selfRun("autogear",    "gear",  "Autogear on YOURSELF.")    end
 
 local function playerTargetName()
     if UnitExists("target") and UnitIsPlayer("target") then
@@ -542,21 +727,29 @@ local function updateReviveMacro()
         "/tar player\n" .. selfChat() .. ".revive\n/p revive")
 end
 
-button("Maint / Gear", function()
+local function groupChannel()
     local inRaid  = (GetNumRaidMembers and GetNumRaidMembers() or 0) > 0
     local inParty = (GetNumPartyMembers and GetNumPartyMembers() or 0) > 0
-    if not inRaid and not inParty then
-        say(RED .. "Not in a party or raid - bots would not hear that." .. R)
-        return
+    if inRaid then return "RAID" elseif inParty then return "PARTY" end
+    return nil
+end
+
+local function groupSend(lines)
+    for _, line in ipairs(lines) do
+        table.insert(sendQueue, { text = line, channel = groupChannel() })
     end
-    local channel = inRaid and "RAID" or "PARTY"
-    guardSelfBot(function()
-        for _, line in ipairs({ "maintenance", "autogear", "nc -loot" }) do
-            table.insert(sendQueue, { text = line, channel = channel })
-        end
-        sender.elapsed = 0.4   -- first one goes out on the next frame
-    end)
-end, "maintenance + autogear + nc -loot to party/raid.\nautogear never sends 'reset', so worn gear is kept.\nIf self-bot is ON this also hits YOU - MiniGM stops and\nmakes you type your character name first.")
+    sender.elapsed = 0.4   -- first one goes out on the next frame
+end
+
+button("Maint", function()
+    if not groupChannel() then maintMe() return end      -- solo: yourself, behind the warning
+    guardSelfBot(function() groupSend({ "maintenance", "nc -loot" }) end, "maint")
+end, "In a group: maintenance + nc -loot to party/raid (bots).\nSolo: maintenance on YOU - skills, professions, talents,\nspells, enchants. Shows every change and waits for Accept.\n/mgm maintme does it on you while grouped.")
+
+button("Gear", function()
+    if not groupChannel() then gearMe() return end        -- solo: yourself, behind the warning
+    guardSelfBot(function() groupSend({ "autogear" }) end, "gear")
+end, "In a group: autogear to party/raid (bots).\nSolo: autogear on YOU - equips generated gear only;\nno skills, professions or talents. Waits for Accept.\n/mgm gearme does it on you while grouped.\nNever sends 'autogear reset' - worn gear is kept.")
 
 ----------------------------------------------------------------------
 -- COMBAT
@@ -589,51 +782,18 @@ button("Cheat status", function() cmd(".cheat status") end,
 section("Character")
 
 -- run an action, but if it would hit ME, demand the word Accept first
-local pendingAction = nil
-
-StaticPopupDialogs["MINIGM_CONFIRM_SELF"] = {
-    text = "This will modify YOUR OWN character.\nType  Accept  (case sensitive) to continue:",
-    button1 = "Confirm", button2 = "Cancel",
-    hasEditBox = 1, timeout = 0, whileDead = 1, hideOnEscape = 1,
-    enterClicksFirstButton = 1,
-    OnShow = function(self)
-        local eb = _G[self:GetName() .. "EditBox"]
-        if eb then eb:SetText("") eb:SetFocus() end
-    end,
-    OnAccept = function(self)
-        local eb = _G[self:GetName() .. "EditBox"]
-        local typed = eb and eb:GetText() or ""
-        if typed == "Accept" then
-            if pendingAction then pendingAction() end
-        else
-            say(RED .. "Cancelled: you must type exactly  Accept" .. R)
-        end
-        pendingAction = nil
-    end,
-    EditBoxOnEnterPressed = function(self)
-        local dialog = self:GetParent()
-        local typed = self:GetText() or ""
-        if typed == "Accept" then
-            if pendingAction then pendingAction() end
-        else
-            say(RED .. "Cancelled: you must type exactly  Accept" .. R)
-        end
-        pendingAction = nil
-        dialog:Hide()
-    end,
-    EditBoxOnEscapePressed = function(self) pendingAction = nil self:GetParent():Hide() end,
-    OnCancel = function() pendingAction = nil end,
-}
-
--- guard: nothing targeted -> refuse; targeting myself -> Accept prompt
-local function runOnTarget(action)
+-- guard: nothing targeted -> refuse; targeting myself -> the confirm window,
+-- stating the exact change (describe() returns e.g. "Parriahtest: level 1 -> 10")
+local function runOnTarget(action, describe)
     if not UnitExists("target") or not UnitIsPlayer("target") then
         say(RED .. "Target a character first (target yourself to modify yourself)." .. R)
         return
     end
     if UnitIsUnit("target", "player") then
-        pendingAction = action
-        StaticPopup_Show("MINIGM_CONFIRM_SELF")
+        local what = describe and describe() or
+            ((UnitName("player") or "?") .. ": (could not preview the change - check the box)")
+        showConfirmWindow("Modify YOUR character.",
+            { "|cffffd100" .. what .. "|r" }, action)
         return
     end
     action()
@@ -648,7 +808,7 @@ local modifyBtn = button("Modify Char", function()
         modFly.refresh()
         modFly:Show()
     end
-end, "Set a new level or add gold on the targeted character.\nTargeting yourself requires typing Accept.")
+end, "Set a new level or add gold on the targeted character.\nTargeting yourself opens the confirm window (type Accept).")
 
 ----------------------------------------------------------------------
 -- BOTS
@@ -773,20 +933,38 @@ local function doGold()
     cmd(".modify money " .. copper)     -- .modify money ADDS, and acts on your target
 end
 
+-- previews for the self-confirm popup (same parsing as doLevel/doGold)
+local function describeLevel()
+    local n = tonumber(trim(levelBox:GetText() or ""))
+    if not n then return nil end
+    if n > 80 then n = 80 end
+    return (UnitName("target") or "?") .. ": level " .. (UnitLevel("target") or "?") .. " -> " .. n
+end
+
+local function describeGold()
+    local g = tonumber(trim(goldBox:GetText() or ""))
+    if not g or g <= 0 then return nil end
+    local copper = math.floor(g * 10000 + 0.5)
+    local gold   = math.floor(copper / 10000)
+    local silver = math.floor((copper - gold * 10000) / 100)
+    local cop    = copper - gold * 10000 - silver * 100
+    return string.format("%s: add %dg %ds %dc", UnitName("target") or "?", gold, silver, cop)
+end
+
 local levelGo = CreateFrame("Button", nil, modFly, "UIPanelButtonTemplate")
 levelGo:SetWidth(40) levelGo:SetHeight(20)
 levelGo:SetPoint("TOPLEFT", modFly, "TOPLEFT", 164, -27)
 levelGo:SetText("Set")
-levelGo:SetScript("OnClick", function() runOnTarget(doLevel) end)
+levelGo:SetScript("OnClick", function() runOnTarget(doLevel, describeLevel) end)
 
 local goldGo = CreateFrame("Button", nil, modFly, "UIPanelButtonTemplate")
 goldGo:SetWidth(40) goldGo:SetHeight(20)
 goldGo:SetPoint("TOPLEFT", modFly, "TOPLEFT", 164, -71)
 goldGo:SetText("Add")
-goldGo:SetScript("OnClick", function() runOnTarget(doGold) end)
+goldGo:SetScript("OnClick", function() runOnTarget(doGold, describeGold) end)
 
-levelBox:SetScript("OnEnterPressed", function(self) self:ClearFocus() runOnTarget(doLevel) end)
-goldBox:SetScript("OnEnterPressed",  function(self) self:ClearFocus() runOnTarget(doGold) end)
+levelBox:SetScript("OnEnterPressed", function(self) self:ClearFocus() runOnTarget(doLevel, describeLevel) end)
+goldBox:SetScript("OnEnterPressed",  function(self) self:ClearFocus() runOnTarget(doGold, describeGold) end)
 
 local modHint = modFly:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
 modHint:SetPoint("BOTTOM", modFly, "BOTTOM", 0, 12)
@@ -1287,6 +1465,7 @@ searchBox:SetScript("OnTextChanged", function(self)
     searchText = trim(self:GetText() or "")
     renderLocs()
 end)
+searchBox:SetScript("OnEnterPressed", function(self) self:ClearFocus() end)
 searchBox:SetScript("OnEscapePressed", function(self)
     self:SetText("")
     self:ClearFocus()
@@ -1320,6 +1499,7 @@ StaticPopupDialogs["MINIGM_TELE_CONFIRM"] = {
     text = "%s",
     button1 = "Teleport", button2 = "Cancel",
     timeout = 0, whileDead = 1, hideOnEscape = 1,
+    enterClicksFirstButton = 1,       -- Enter = Teleport, like every other MiniGM prompt
     OnAccept = function()
         if pendingTele then pendingTele() end
         pendingTele = nil
@@ -1648,6 +1828,21 @@ attachGrip(pick, "MiniGMTeleSizeGrip", applyPickScale,
     end,
     "Drag to resize the teleport picker.\nSized independently of the panel.\n/mgm telescale <0.5-2> sets it exactly.")
 
+-- the Maint / Gear warning window gets the same grip (1.2.0)
+local function applyWarnScale(n)
+    n = clampScale(n)
+    MiniGMDB.warnScale = n
+    warn:SetScale(n)
+    return n
+end
+
+attachGrip(warn, "MiniGMWarnSizeGrip", applyWarnScale,
+    function()
+        local point, _, rel, x, y = warn:GetPoint()
+        MiniGMDB.warnPos = { point = point, rel = rel, x = x, y = y }
+    end,
+    "Drag to resize this warning window.\nSize and position are remembered.\n/mgm reset puts it back.")
+
 ----------------------------------------------------------------------
 -- events, saved position, slash command
 ----------------------------------------------------------------------
@@ -1661,13 +1856,23 @@ ev:RegisterEvent("PLAYER_ENTERING_WORLD")
 ev:RegisterEvent("PARTY_MEMBERS_CHANGED")
 ev:RegisterEvent("RAID_ROSTER_UPDATE")
 ev:RegisterEvent("CHAT_MSG_SYSTEM")
-ev:SetScript("OnEvent", function(self, event, unit)
+ev:RegisterEvent("CHAT_MSG_WHISPER")
+ev:SetScript("OnEvent", function(self, event, unit, arg2)
+    if event == "CHAT_MSG_WHISPER" then
+        -- a whisper FROM yourself that is not the command's own echo = the
+        -- self-bot AI answering
+        if selfReply.want and arg2 == UnitName("player")
+           and string.lower(trim(unit or "")) ~= string.lower(selfReply.want) then
+            selfReply.got = true
+        end
+        return
+    end
     if event == "CHAT_MSG_SYSTEM" then
         local msg = unit or ""
         if string.find(msg, "Enable player botAI", 1, true) then
             setSelfBot(true)
             say(RED .. "Self-bot is ON for " .. (UnitName("player") or "?") ..
-                " - Maint/Gear will ask for your name first." .. R)
+                " - Maint and Gear will ask for Accept first." .. R)
         elseif string.find(msg, "Disable player botAI", 1, true)
             or string.find(msg, "Self-bot is disabled", 1, true)
             or string.find(msg, "do not have permission to enable player botAI", 1, true) then
@@ -1735,9 +1940,11 @@ SlashCmdList["MINIGM"] = function(msg)
     msg = trim(msg or "")
     local lower = string.lower(msg)
 
+    if lower == "maintme" then maintMe() return end
+    if lower == "gearme"  then gearMe()  return end
     if lower == "selfbot" then
         say("self-bot for " .. (UnitName("player") or "?") .. ": " ..
-            (selfBotOn() and (RED .. "ON (Maint/Gear will ask for your name)" .. R) or "off"))
+            (selfBotOn() and (RED .. "ON (Maint and Gear will ask for Accept)" .. R) or "off"))
         return
     end
     if lower == "selfbot off" then
@@ -1861,8 +2068,12 @@ SlashCmdList["MINIGM"] = function(msg)
     if lower == "reset" then
         MiniGMDB.pos = nil
         MiniGMDB.pickPos = nil
+        MiniGMDB.warnPos = nil
         applyScale(1)
         applyPickScale(1)
+        applyWarnScale(1)
+        warn:ClearAllPoints()
+        warn:SetPoint("CENTER", UIParent, "CENTER", 0, 80)
         f:ClearAllPoints()
         f:SetPoint("CENTER")
         pick:ClearAllPoints()
@@ -1885,6 +2096,7 @@ SlashCmdList["MINIGM"] = function(msg)
         say("/mgm flyspeed <0.1-50>  - current " .. (MiniGMDB.flySpeed or 4.65) ..
             "  (2.8 epic, 3.1 fastest, 4.65 = 1.5x fastest)")
         say("/mgm flymount <displayID>  - current " .. (MiniGMDB.flyMount or 28652))
+        say("/mgm maintme  - maintenance on YOURSELF  |  /mgm gearme  - autogear on YOURSELF  (warning + Accept first)")
         say("/mgm selfbot  - is self-bot on for this character?  |  /mgm selfbot off  - clear MiniGM's flag")
         return
     end
