@@ -7,7 +7,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/WoW-3.3.5a%20(WotLK)-A330C9" alt="WoW 3.3.5a">
   <img src="https://img.shields.io/badge/server-AzerothCore-1E8CBE" alt="AzerothCore">
-  <img src="https://img.shields.io/badge/version-1.2.0-F0A020" alt="1.2.0">
+  <img src="https://img.shields.io/badge/version-1.2.1-F0A020" alt="1.2.1">
   <img src="https://img.shields.io/badge/license-GPLv3-3DA639" alt="GPLv3">
   <img src="https://img.shields.io/badge/libraries-none-6E7781" alt="No libraries">
   <img src="https://img.shields.io/badge/built%20with-AI%20assistance-8A63D2" alt="Built with AI assistance">
