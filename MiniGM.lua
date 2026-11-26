@@ -26,7 +26,7 @@
 ----------------------------------------------------------------------]]
 
 local ADDON   = "MiniGM"
-local VERSION = "1.2.0"
+local VERSION = "1.2.1"
 local FRAME_H = 403   -- +25 in 1.2.0: Maint and Gear are separate buttons
 
 local GOLD  = "|cffffd100"
@@ -147,10 +147,10 @@ end
 -- ".playerbots bot self" gives YOUR character bot AI. While it is on, your
 -- own character obeys "maintenance"/"autogear" said in party/raid chat, the
 -- same as a bot. The server announces the toggle with the exact system lines
--- "Enable player botAI" / "Disable player botAI" (PlayerbotMgr.cpp).
+-- "SelfBot is now active." / "SelfBot is now deactivated." (PlayerbotMgr.cpp, module Nov 2026+; older builds: "Enable player botAI" / "Disable player botAI").
 -- State is kept per character in MiniGMDB.selfBot and survives /reload.
 -- Fail-safe: if MiniGM last saw it ON, it stays ON until the server says
--- "Disable player botAI" (or /mgm selfbot off). Worst case = an extra popup.
+-- self-bot is off (or /mgm selfbot off). Worst case = an extra popup.
 ----------------------------------------------------------------------
 local function selfBotOn()
     MiniGMDB.selfBot = MiniGMDB.selfBot or {}
@@ -1869,11 +1869,11 @@ ev:SetScript("OnEvent", function(self, event, unit, arg2)
     end
     if event == "CHAT_MSG_SYSTEM" then
         local msg = unit or ""
-        if string.find(msg, "Enable player botAI", 1, true) then
+        if string.find(msg, "Enable player botAI", 1, true) or string.find(msg, "SelfBot is now active", 1, true) then
             setSelfBot(true)
             say(RED .. "Self-bot is ON for " .. (UnitName("player") or "?") ..
                 " - Maint and Gear will ask for Accept first." .. R)
-        elseif string.find(msg, "Disable player botAI", 1, true)
+        elseif string.find(msg, "Disable player botAI", 1, true) or string.find(msg, "SelfBot is now deactivated", 1, true) or string.find(msg, "SelfBot is disabled server-wide", 1, true) or string.find(msg, "SelfBot is restricted for this account", 1, true)
             or string.find(msg, "Self-bot is disabled", 1, true)
             or string.find(msg, "do not have permission to enable player botAI", 1, true) then
             if selfBotOn() then say("Self-bot is off.") end

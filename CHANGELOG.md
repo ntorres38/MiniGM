@@ -4,6 +4,13 @@ WoW 3.3.5a (Interface 30300), AzerothCore.
 
 ---
 
+## 1.2.1 — new self-bot server lines
+
+- FIX **Self Maint/Gear and the self-bot guard stopped working on mod-playerbots builds from Nov 13, 2026** (verified against `ecc4a53`). The module renamed the self-bot toggle's system lines: `Enable player botAI` -> `SelfBot is now active.`, `Disable player botAI` -> `SelfBot is now deactivated.`, plus new refusal lines `SelfBot is disabled server-wide.` and `SelfBot is restricted for this account.` MiniGM matches these lines verbatim, so it never saw self-bot turn on: solo Maint/Gear always aborted with "Self-bot did not turn on - nothing else was sent", and the guard on grouped Maint/Gear silently stopped firing. MiniGM now matches the new lines and still matches the old ones, so both module generations work.
+- FIX docs/COMMANDS.md and docs/USER-GUIDE.md said the self-bot warning asks for your character name; the confirm word has been `Accept` (case sensitive) since 1.2.0. Config key references updated to the module's new `Playerbots.` prefix.
+
+---
+
 ## 1.2.0 — self-bot guard
 
 - ADD **Self-bot guard on Maint and Gear.** With `.playerbots bot self` on, your own character obeys `maintenance` and `autogear` said in party chat, exactly like a bot. `maintenance` permanently learns weapon skills, professions and secondary skills (First Aid, Fishing, Cooking), every available spell, spends all talent points, adds glyphs, enchants and gems gear, and fills your bags. MiniGM now watches for the server's `Enable player botAI` / `Disable player botAI` lines, and while self-bot is on either button opens a warning that lists every change and sends nothing until you type `Accept` (case sensitive). The list was checked line by line against `MaintenanceAction::Execute` on mod-playerbots `b6696bd`.
